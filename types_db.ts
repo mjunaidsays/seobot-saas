@@ -9,6 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      articles: {
+        Row: {
+          id: string
+          project_id: string | null
+          user_id: string
+          topic: string
+          content: string
+          keywords: string[] | null
+          word_count: number | null
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          user_id: string
+          topic: string
+          content: string
+          keywords?: string[] | null
+          word_count?: number | null
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          user_id?: string
+          topic?: string
+          content?: string
+          keywords?: string[] | null
+          word_count?: number | null
+          status?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           id: string
@@ -105,6 +156,47 @@ export type Database = {
           name?: string | null
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          id: string
+          user_id: string
+          url: string
+          research_data: Json | null
+          plan: Json | null
+          chat_history: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          url: string
+          research_data?: Json | null
+          plan?: Json | null
+          chat_history?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          url?: string
+          research_data?: Json | null
+          plan?: Json | null
+          chat_history?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
