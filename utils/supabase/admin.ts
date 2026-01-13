@@ -1,8 +1,31 @@
 import { toDateTime } from '@/utils/helpers';
-import { stripe } from '@/utils/stripe/config';
+// Stripe imports - commented out for future use
+// Uncomment these when Stripe integration is needed:
+// import { stripe } from '@/utils/stripe/config';
+// import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
 import type { Database, Tables, TablesInsert } from 'types_db';
+
+// Temporary type stubs to prevent build errors
+// Remove these and uncomment Stripe imports above when enabling Stripe
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type StripeProduct = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type StripePrice = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type StripePaymentMethod = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const stripe: any = {
+  customers: {
+    create: () => Promise.resolve({ id: '' }),
+    retrieve: () => Promise.resolve({ id: '' }),
+    list: () => Promise.resolve({ data: [] }),
+    update: () => Promise.resolve({}),
+  },
+  subscriptions: {
+    retrieve: () => Promise.resolve({}),
+  },
+};
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
@@ -17,7 +40,7 @@ const supabaseAdmin = createClient<Database>(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-const upsertProductRecord = async (product: Stripe.Product) => {
+const upsertProductRecord = async (product: StripeProduct) => {
   const productData: Product = {
     id: product.id,
     active: product.active,
@@ -36,7 +59,7 @@ const upsertProductRecord = async (product: Stripe.Product) => {
 };
 
 const upsertPriceRecord = async (
-  price: Stripe.Price,
+  price: StripePrice,
   retryCount = 0,
   maxRetries = 3
 ) => {
@@ -74,7 +97,7 @@ const upsertPriceRecord = async (
   }
 };
 
-const deleteProductRecord = async (product: Stripe.Product) => {
+const deleteProductRecord = async (product: StripeProduct) => {
   const { error: deletionError } = await supabaseAdmin
     .from('products')
     .delete()
@@ -84,7 +107,7 @@ const deleteProductRecord = async (product: Stripe.Product) => {
   console.log(`Product deleted: ${product.id}`);
 };
 
-const deletePriceRecord = async (price: Stripe.Price) => {
+const deletePriceRecord = async (price: StripePrice) => {
   const { error: deletionError } = await supabaseAdmin
     .from('prices')
     .delete()
@@ -191,7 +214,7 @@ const createOrRetrieveCustomer = async ({
  */
 const copyBillingDetailsToCustomer = async (
   uuid: string,
-  payment_method: Stripe.PaymentMethod
+  payment_method: StripePaymentMethod
 ) => {
   //Todo: check this assertion
   const customer = payment_method.customer as string;
@@ -279,7 +302,7 @@ const manageSubscriptionStatusChange = async (
     //@ts-ignore
     await copyBillingDetailsToCustomer(
       uuid,
-      subscription.default_payment_method as Stripe.PaymentMethod
+      subscription.default_payment_method as StripePaymentMethod
     );
 };
 

@@ -22,7 +22,7 @@ export type Database = {
           created_at: string
         }
         Insert: {
-          id: string
+          id?: string
           project_id?: string | null
           user_id: string
           topic: string
@@ -169,7 +169,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          id: string
+          id?: string
           user_id: string
           url: string
           research_data?: Json | null

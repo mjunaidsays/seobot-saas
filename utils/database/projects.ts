@@ -1,5 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { ResearchData, PlanItem } from '@/lib/types/api'
+import type { Database } from '@/types_db'
+
+type ProjectsInsert = Database['public']['Tables']['projects']['Insert']
 
 export interface ProjectData {
   id: string
@@ -30,7 +33,7 @@ export async function getProjectByUrl(userId: string, url: string): Promise<Proj
     return null
   }
 
-  return data as ProjectData | null
+  return data as unknown as ProjectData | null
 }
 
 export async function createProject(
@@ -40,15 +43,16 @@ export async function createProject(
   plan: PlanItem[]
 ): Promise<ProjectData | null> {
   const supabase = createClient()
+  const insertData: ProjectsInsert = {
+    user_id: userId,
+    url,
+    research_data: researchData as any,
+    plan: plan as any,
+    chat_history: [] as any,
+  }
   const { data, error } = await supabase
     .from('projects')
-    .insert({
-      user_id: userId,
-      url,
-      research_data: researchData,
-      plan,
-      chat_history: [],
-    })
+    .insert(insertData)
     .select()
     .single()
 
@@ -61,7 +65,7 @@ export async function createProject(
     return null
   }
 
-  return data as ProjectData | null
+  return data as unknown as ProjectData | null
 }
 
 export async function updateProject(
@@ -73,9 +77,14 @@ export async function updateProject(
   }
 ): Promise<ProjectData | null> {
   const supabase = createClient()
+  const updateData: Partial<Database['public']['Tables']['projects']['Update']> = {
+    ...(updates.research_data !== undefined && { research_data: updates.research_data as any }),
+    ...(updates.plan !== undefined && { plan: updates.plan as any }),
+    ...(updates.chat_history !== undefined && { chat_history: updates.chat_history as any }),
+  }
   const { data, error } = await supabase
     .from('projects')
-    .update(updates)
+    .update(updateData)
     .eq('id', projectId)
     .select()
     .single()
@@ -89,7 +98,7 @@ export async function updateProject(
     return null
   }
 
-  return data as ProjectData | null
+  return data as unknown as ProjectData | null
 }
 
 export async function getProject(projectId: string): Promise<ProjectData | null> {
@@ -109,5 +118,5 @@ export async function getProject(projectId: string): Promise<ProjectData | null>
     return null
   }
 
-  return data as ProjectData | null
+  return data as unknown as ProjectData | null
 }

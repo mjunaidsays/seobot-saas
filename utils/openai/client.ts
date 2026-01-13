@@ -63,7 +63,7 @@ export async function researchSite(url: string): Promise<ResearchData> {
         }
       })
       
-      return [...new Set(links)].slice(0, 10) // Top 10 internal links
+      return Array.from(new Set(links)).slice(0, 10) // Top 10 internal links
     }
     
     // Step 1: Homepage
