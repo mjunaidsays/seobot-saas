@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "question": "What is SEObot and how does it work?",
+    "answer": "SEObot is an AI-powered content generation tool that analyzes your website, understands your niche and audience, then automatically creates SEO-optimized articles. Simply enter your website URL, and SEObot will research your site, generate a content plan, and create high-quality articles tailored to your audience."
+  },
+  {
+    "id": 2,
+    "question": "Do I need any technical knowledge to use SEObot?",
+    "answer": "No technical knowledge required! SEObot is designed to be user-friendly. Just sign up with your email or Google account, enter your website URL, and let our AI do the rest. The interface is intuitive and guides you through each step."
+  },
+  {
+    "id": 3,
+    "question": "How long does it take to generate an article?",
+    "answer": "Website analysis takes about 30-60 seconds, and article generation typically takes 1-2 minutes per article. The exact time depends on the article length and complexity. You can generate multiple articles in one session."
+  },
+  {
+    "id": 4,
+    "question": "What makes SEObot different from other AI writing tools?",
+    "answer": "SEObot doesn't just generate generic content - it first analyzes YOUR specific website to understand your audience, niche, and existing content. It then creates articles that match your site's tone and style, includes internal linking to your pages, and optimizes for your target keywords."
+  },
+  {
+    "id": 5,
+    "question": "Can I edit the generated articles?",
+    "answer": "Yes! All generated articles are provided in Markdown format, which you can easily copy, edit, and customize before publishing. You have full control over the final content."
+  },
+  {
+    "id": 6,
+    "question": "Is the content unique and plagiarism-free?",
+    "answer": "Yes, all content is generated fresh by AI and is unique. The AI creates original articles based on your website's analysis and doesn't copy from existing sources. However, we always recommend reviewing content before publishing."
+  },
+  {
+    "id": 7,
+    "question": "What languages does SEObot support?",
+    "answer": "Currently, SEObot generates content in English. We're working on adding support for multiple languages including Spanish, French, German, and more."
+  },
+  {
+    "id": 8,
+    "question": "How do I get started?",
+    "answer": "Getting started is easy! Click the 'Try now' button, sign up with your email or Google account, enter your website URL, and watch as SEObot analyzes your site and generates a custom content plan. No credit card required for initial analysis."
+  }
+]

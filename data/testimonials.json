@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Sarah Chen",
+    "username": "@sarahchen_seo",
+    "content": "SEObot transformed my content strategy! I went from publishing 2 articles a month to 12, and my organic traffic increased by 300% in just 3 months. The AI really understands my niche.",
+    "date": "2 hours ago",
+    "image": false
+  },
+  {
+    "id": 2,
+    "name": "Mike Rodriguez",
+    "username": "@mike_digital",
+    "content": "As a solo founder, I don't have time to write SEO content. SEObot does it for me, and the quality is amazing. It even adds internal links to my existing pages automatically!",
+    "date": "1 day ago",
+    "image": false
+  },
+  {
+    "id": 3,
+    "name": "Emma Watson",
+    "username": "@emmawrites",
+    "content": "I was skeptical about AI content at first, but SEObot proved me wrong. The articles it generates are well-researched, engaging, and actually rank on Google. Game changer!",
+    "date": "3 days ago",
+    "image": false
+  },
+  {
+    "id": 4,
+    "name": "David Kim",
+    "username": "@david_saas",
+    "content": "Best ROI I've ever seen in a content tool. For the price of one freelance writer, I get unlimited articles that are perfectly optimized for my SaaS blog. Highly recommend!",
+    "date": "5 days ago",
+    "image": false
+  },
+  {
+    "id": 5,
+    "name": "Lisa Thompson",
+    "username": "@lisathompson",
+    "content": "SEObot analyzed my site and found content gaps I didn't even know existed. The content plan it generated is spot-on, and execution is flawless. This is the future of content marketing!",
+    "date": "1 week ago",
+    "image": false
+  },
+  {
+    "id": 6,
+    "name": "James Anderson",
+    "username": "@james_growth",
+    "content": "Went from 500 monthly visitors to 15K in 6 months using SEObot. The AI understands search intent better than most human writers I've worked with. Worth every penny!",
+    "date": "1 week ago",
+    "image": false
+  }
+]

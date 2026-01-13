@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "category": "Listicles",
+    "title": "10 SEO Trends Every Content Creator Should Know in 2024",
+    "description": "Discover the latest SEO strategies that are transforming content marketing. From AI-powered optimization to voice search tactics.",
+    "link": "#"
+  },
+  {
+    "id": 2,
+    "category": "How-to Guides",
+    "title": "How to Generate High-Quality SEO Content with AI",
+    "description": "A step-by-step guide to leveraging AI tools for creating engaging, search-optimized content that ranks.",
+    "link": "#"
+  },
+  {
+    "id": 3,
+    "category": "Ultimate Guides",
+    "title": "The Complete Guide to Content Strategy for SEO Success",
+    "description": "Master the art of content planning, keyword research, and on-page optimization with this comprehensive guide.",
+    "link": "#"
+  },
+  {
+    "id": 4,
+    "category": "Versus Articles",
+    "title": "AI Content Generation vs. Manual Writing: Which is Better?",
+    "description": "Compare the pros and cons of AI-assisted content creation versus traditional writing methods for SEO.",
+    "link": "#"
+  },
+  {
+    "id": 5,
+    "category": "Checklists",
+    "title": "SEO Content Optimization Checklist: 25 Essential Steps",
+    "description": "Ensure your content is fully optimized with this comprehensive checklist covering technical and creative aspects.",
+    "link": "#"
+  },
+  {
+    "id": 6,
+    "category": "Roundups",
+    "title": "Best AI Writing Tools for SEO Content in 2024",
+    "description": "A curated roundup of the top AI-powered content generation tools that help you scale your SEO efforts.",
+    "link": "#"
+  }
+]
