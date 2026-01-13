@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       } catch (dbError) {
         console.error('❌ /api/generate - Database error when creating article:', dbError)
         // Check if it's a migration error (articles table might also be missing)
-        if (dbError instanceof Error && dbError.message.includes('Database migration required') || dbError.message?.includes('Could not find the table')) {
+        if (dbError instanceof Error && (dbError.message.includes('Database migration required') || dbError.message?.includes('Could not find the table'))) {
           return NextResponse.json(
             {
               error: 'Database migration required',
