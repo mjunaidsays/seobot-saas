@@ -149,7 +149,7 @@ export async function researchSite(url: string): Promise<ResearchData> {
     `
     
     const completion = await client.chat.completions.create({
-      model: 'gpt-4o-mini', // Using gpt-4o-mini as gpt-5-nano may not be available
+      model: 'gpt-5-nano',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
     })
@@ -189,7 +189,7 @@ export async function generateContentPlan(
     `
   
   const completion = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-nano',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
   })
@@ -256,7 +256,7 @@ export async function updateContentPlan(
     `
   
   const completion = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-nano',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
   })
@@ -340,7 +340,7 @@ export async function generateArticle(
 
   try {
     const completion = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-nano',
       messages: [
         {
           role: 'system',
