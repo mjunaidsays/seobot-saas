@@ -349,7 +349,8 @@ export async function generateArticle(
         },
         { role: 'user', content: prompt },
       ],
-      max_tokens: 4000,
+      max_completion_tokens: 4000,
+      reasoning_effort: 'low',
     })
     
     const finalArticle = completion.choices[0].message.content?.trim() || ''
