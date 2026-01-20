@@ -5,13 +5,20 @@ import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
 import { cn } from '@/utils/cn';
 import { Inter as FontSans } from 'next/font/google';
+import { JetBrains_Mono as FontMono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import dynamic from 'next/dynamic';
 import { Analytics } from '@vercel/analytics/react';
 
 const fontSans = FontSans({
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
   variable: '--font-sans'
+});
+
+const fontMono = FontMono({
+  subsets: ['latin'],
+  variable: '--font-mono'
 });
 
 const meta = {
@@ -62,7 +69,8 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       <body
         className={cn(
           'min-h-screen bg-background font-sans antialiased loading',
-          fontSans.variable
+          fontSans.variable,
+          fontMono.variable
         )}
       >
         <CrispWithNoSSR />

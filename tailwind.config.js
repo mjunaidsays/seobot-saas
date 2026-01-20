@@ -28,8 +28,10 @@ module.exports = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
-          green: '#00FF00',
-          lime: '#C8FF00'
+          green: '#10b981',
+          emerald: '#10b981',
+          cyan: '#06b6d4',
+          lime: '#84cc16'
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -80,7 +82,15 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
-        mono: ['var(--font-mono)', 'Courier New', 'monospace']
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'Courier New', 'monospace']
+      },
+      letterSpacing: {
+        tighter: '-0.05em',
+        tight: '-0.02em',
+        normal: '0',
+        wide: '0.02em',
+        wider: '0.05em',
+        widest: '0.1em'
       },
       keyframes: {
         'accordion-down': {
@@ -94,12 +104,17 @@ module.exports = {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-8px)' }
+        },
+        glow: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.2)' },
+          '50%': { boxShadow: '0 0 30px rgba(16, 185, 129, 0.4)' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        float: 'float ease-in-out infinite'
+        float: 'float ease-in-out infinite',
+        glow: 'glow 2s ease-in-out infinite'
       }
     }
   },

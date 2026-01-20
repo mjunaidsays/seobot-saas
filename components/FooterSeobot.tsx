@@ -2,11 +2,11 @@ import Link from 'next/link'
 
 export default function FooterSeobot() {
   return (
-    <footer className="bg-black border-t border-gray-900 py-12 md:py-16">
+    <footer className="glass border-t border-white/10 py-12 md:py-16 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Logo */}
         <div className="mb-8">
-          <span className="text-2xl font-bold text-primary-green">seobot</span>
+          <span className="text-2xl font-bold text-emerald-400 tracking-tight">seobot</span>
         </div>
 
         {/* Footer Content */}
@@ -18,7 +18,7 @@ export default function FooterSeobot() {
               <li>
                 <Link
                   href="mailto:support@seobotai.com"
-                  className="text-gray-400 hover:text-primary-green transition-colors text-sm"
+                  className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]"
                 >
                   support@seobotai.com
                 </Link>
@@ -27,7 +27,7 @@ export default function FooterSeobot() {
                 <Link
                   href="https://x.com/johnrushx"
                   target="_blank"
-                  className="text-gray-400 hover:text-primary-green transition-colors text-sm"
+                  className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]"
                 >
                   x.com/johnrushx
                 </Link>
@@ -36,7 +36,7 @@ export default function FooterSeobot() {
                 <Link
                   href="https://x.com/vitalik_may"
                   target="_blank"
-                  className="text-gray-400 hover:text-primary-green transition-colors text-sm"
+                  className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]"
                 >
                   x.com/vitalik_may
                 </Link>
@@ -45,7 +45,7 @@ export default function FooterSeobot() {
                 <Link
                   href="https://x.com/seobotai"
                   target="_blank"
-                  className="text-gray-400 hover:text-primary-green transition-colors text-sm"
+                  className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]"
                 >
                   x.com/seobotai
                 </Link>
@@ -58,32 +58,32 @@ export default function FooterSeobot() {
             <h3 className="text-white font-semibold mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Affiliate Program
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Knowledge Base
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   News
                 </Link>
               </li>
@@ -95,27 +95,27 @@ export default function FooterSeobot() {
             <h3 className="text-white font-semibold mb-4">API & Integrations</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   REST API
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   NextJs integration
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Webhooks
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   WordPress
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Webflow
                 </Link>
               </li>
@@ -127,22 +127,22 @@ export default function FooterSeobot() {
             <h3 className="text-white font-semibold mb-4">Mars Verse</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   John Rush
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   MarsX
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Unicorn Platform
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-primary-green transition-colors text-sm">
+                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   DevHunt
                 </Link>
               </li>
@@ -151,7 +151,7 @@ export default function FooterSeobot() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
             Copyright © 2025 SEO Bot AI
           </p>
@@ -160,7 +160,7 @@ export default function FooterSeobot() {
             <Link
               href="https://unicornplatform.com"
               target="_blank"
-              className="ml-1 text-primary-green hover:underline"
+              className="ml-1 text-emerald-400 hover:underline"
             >
               Unicorn Platform
             </Link>

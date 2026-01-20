@@ -37,7 +37,7 @@ export default function StatsShowcase() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
         {statsData.map((stat, index) => (
           <motion.div
             key={stat.site}
@@ -48,7 +48,7 @@ export default function StatsShowcase() {
             className="relative"
           >
             <div
-              className="bg-gray-900 border border-gray-800 rounded-lg p-6 transition-all duration-300 hover:scale-105 hover:rotate-0"
+              className="glass rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:rotate-0 glass-hover"
               style={{ transform: `rotate(${stat.rotation}deg)` }}
             >
               {/* Orange Label */}
@@ -69,7 +69,7 @@ export default function StatsShowcase() {
                 </div>
 
                 {/* Mock Chart */}
-                <div className="h-48 bg-gray-950 rounded-lg relative overflow-hidden">
+                <div className="h-48 bg-black/30 rounded-xl relative overflow-hidden border border-white/5">
                   <div className="absolute inset-0 flex items-end p-4">
                     <svg className="w-full h-full" viewBox="0 0 400 150">
                       <path

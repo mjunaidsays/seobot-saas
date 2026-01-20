@@ -32,17 +32,17 @@ export default function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden"
+            className="glass rounded-2xl overflow-hidden glass-hover"
           >
             <button
               onClick={() => toggleFAQ(faq.id)}
-              className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-800 transition-colors"
+              className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
             >
               <span className="text-white font-medium pr-8">
                 {faq.id}. {faq.question}
               </span>
               <FaChevronDown
-                className={`text-primary-green flex-shrink-0 transition-transform duration-300 ${
+                className={`text-emerald-400 flex-shrink-0 transition-transform duration-300 ${
                   openId === faq.id ? 'rotate-180' : ''
                 }`}
               />

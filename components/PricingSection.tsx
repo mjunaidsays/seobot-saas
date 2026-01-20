@@ -33,10 +33,10 @@ export default function PricingSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-gray-900 border border-gray-800 rounded-lg p-8"
+            className="glass rounded-2xl p-8 glass-hover"
           >
             <h3 className="text-white font-bold text-xl mb-4">
-              Built with <span className="text-primary-green">AI-Powered SEO</span>
+              Built with <span className="text-emerald-400">AI-Powered SEO</span>
             </h3>
             
             <div className="space-y-4 text-gray-400">
@@ -55,11 +55,11 @@ export default function PricingSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-gray-900 border border-primary-green rounded-lg p-8"
+            className="glass border-emerald-500/50 rounded-2xl p-8 glass-hover"
           >
             <div className="text-center mb-6">
               <div className="text-5xl font-bold text-white mb-2">
-                $<span className="text-7xl text-primary-green">49</span>
+                $<span className="text-7xl text-emerald-400">49</span>
               </div>
               <p className="text-gray-400">/month</p>
               <p className="text-sm text-gray-500 mt-2">Subscriptions start at</p>
@@ -74,7 +74,7 @@ export default function PricingSection() {
             <div className="space-y-3">
               {features.map((feature, index) => (
                 <div key={index} className="flex items-start space-x-3">
-                  <FaCheck className="text-primary-green mt-1 flex-shrink-0" />
+                  <FaCheck className="text-emerald-400 mt-1 flex-shrink-0" />
                   <p className={`text-sm ${index === 0 ? 'font-bold text-white' : 'text-gray-300'}`}>
                     {feature}
                   </p>

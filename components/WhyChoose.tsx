@@ -22,7 +22,7 @@ export default function WhyChoose() {
         transition={{ duration: 0.6 }}
         className="max-w-3xl mx-auto"
       >
-        <CardSeobot className="bg-gradient-to-br from-gray-900 to-gray-950 border-primary-green/20">
+        <CardSeobot className="glass bg-gradient-to-br from-white/5 to-white/0 border-emerald-500/30 glass-hover">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-gray-800 rounded-full flex-shrink-0" />
             <div className="flex-1">
@@ -35,9 +35,9 @@ export default function WhyChoose() {
                   Hey John, I need to give you an update on that!
                 </h3>
                 <div className="space-y-2 text-gray-300">
-                  <p>1. <span className="text-primary-green font-semibold">500 clicks a day</span></p>
-                  <p>2. The cost was <span className="text-primary-green font-semibold">$1000 in article</span></p>
-                  <p>3. We closed a <span className="text-primary-green font-semibold">$6500 client</span> when the business wasn&apos;t even operational.</p>
+                  <p>1. <span className="text-emerald-400 font-semibold">500 clicks a day</span></p>
+                  <p>2. The cost was <span className="text-emerald-400 font-semibold">$1000 in article</span></p>
+                  <p>3. We closed a <span className="text-emerald-400 font-semibold">$6500 client</span> when the business wasn&apos;t even operational.</p>
                 </div>
               </div>
             </div>

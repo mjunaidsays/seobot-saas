@@ -34,7 +34,7 @@ export default function Testimonials() {
           {duplicatedTestimonials.map((testimonial, index) => (
             <div
               key={`${testimonial.id}-${index}`}
-              className="flex-shrink-0 w-80 bg-gray-900 border border-gray-800 rounded-lg p-6"
+              className="flex-shrink-0 w-80 glass rounded-2xl p-6 glass-hover"
             >
               <div className="flex items-start space-x-3 mb-4">
                 <div className="w-12 h-12 bg-gray-800 rounded-full flex-shrink-0" />
@@ -54,7 +54,7 @@ export default function Testimonials() {
               </p>
               
               {testimonial.image && (
-                <div className="bg-gray-950 rounded-lg h-32 mb-3" />
+                <div className="bg-black/30 rounded-xl h-32 mb-3 border border-white/5" />
               )}
               
               <p className="text-gray-500 text-xs">{testimonial.date}</p>
@@ -77,7 +77,7 @@ export default function Testimonials() {
           {duplicatedTestimonials.map((testimonial, index) => (
             <div
               key={`${testimonial.id}-rev-${index}`}
-              className="flex-shrink-0 w-80 bg-gray-900 border border-gray-800 rounded-lg p-6"
+              className="flex-shrink-0 w-80 glass rounded-2xl p-6 glass-hover"
             >
               <div className="flex items-start space-x-3 mb-4">
                 <div className="w-12 h-12 bg-gray-800 rounded-full flex-shrink-0" />
@@ -97,7 +97,7 @@ export default function Testimonials() {
               </p>
               
               {testimonial.image && (
-                <div className="bg-gray-950 rounded-lg h-32 mb-3" />
+                <div className="bg-black/30 rounded-xl h-32 mb-3 border border-white/5" />
               )}
               
               <p className="text-gray-500 text-xs">{testimonial.date}</p>
