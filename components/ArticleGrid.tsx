@@ -8,7 +8,7 @@ import { FaArrowRight } from 'react-icons/fa'
 import articlesData from '@/data/articles.json'
 
 const categoryColors: { [key: string]: string } = {
-  'Listicles': 'bg-primary-green text-black',
+  'Listicles': 'bg-emerald-500 text-white',
   'How-to Guides': 'bg-purple-600 text-white',
   'Checklists': 'bg-blue-600 text-white',
   'QA Articles': 'bg-orange-600 text-white',
@@ -33,14 +33,14 @@ export default function ArticleGrid() {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <CardSeobot className="h-full hover:border-primary-green transition-all duration-300 hover:scale-105 cursor-pointer">
+            <CardSeobot className="h-full glass-hover cursor-pointer">
               <div className="mb-3">
                 <span className={`${categoryColors[article.category] || 'bg-gray-700 text-white'} px-3 py-1 rounded-md text-sm font-semibold`}>
                   {article.category}
                 </span>
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-3 hover:text-primary-green transition-colors">
+              <h3 className="text-xl font-bold text-white mb-3 hover:text-emerald-400 transition-colors">
                 {article.title}
               </h3>
               
@@ -50,7 +50,7 @@ export default function ArticleGrid() {
               
               <Link
                 href={article.link}
-                className="inline-flex items-center space-x-2 text-primary-green hover:underline font-medium text-sm group"
+                className="inline-flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 hover:underline font-medium text-sm group transition-colors"
               >
                 <span>Read more</span>
                 <FaArrowRight className="group-hover:translate-x-1 transition-transform" />

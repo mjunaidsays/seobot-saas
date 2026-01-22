@@ -35,16 +35,22 @@ export default function HeroSeobot() {
   }, [])
 
   return (
-    <section className="min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-16 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto text-center">
+    <section className="min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-16 px-4 md:px-8 relative">
+      {/* Subtle background gradients */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="max-w-6xl mx-auto text-center relative z-10">
         {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-primary-green text-sm md:text-base font-mono font-bold mb-6"
+          className="text-emerald-400 text-sm md:text-base font-mono font-bold mb-8 tracking-tight"
         >
-          {'//'} Powered by AI and GPT agents
+          {'//'} Next-generation SEO automation
         </motion.p>
 
         {/* Main Heading with Typing Animation */}
@@ -52,12 +58,13 @@ export default function HeroSeobot() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-6"
+          className="mb-8"
         >
-          <h1 className="text-2xl md:text-4xl lg:text-5xl font-mono leading-tight">
-            SEObot — fully autonomous «SEO Robot»
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
+            <span className="gradient-text">SEObot</span> — fully autonomous{' '}
+            <span className="gradient-text-accent">«SEO Robot»</span>
             <br />
-            with AI agents for{' '}
+            <span className="text-slate-100">with AI agents for{' '}</span>
             <span className="relative inline-block">
               <AnimatePresence mode="wait">
                 <motion.span
@@ -66,7 +73,7 @@ export default function HeroSeobot() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="text-primary-green inline-block"
+                  className="text-emerald-400 inline-block font-semibold"
                 >
                   {audiences[currentIndex]}
                 </motion.span>
@@ -74,7 +81,7 @@ export default function HeroSeobot() {
               <motion.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="inline-block ml-1 text-primary-green"
+                className="inline-block ml-1 text-emerald-400"
               >
                 |
               </motion.span>
@@ -87,11 +94,11 @@ export default function HeroSeobot() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-gray-300 text-lg md:text-xl mb-8 max-w-3xl mx-auto"
+          className="text-slate-300 text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed"
         >
-          SEObot takes 100% of SEO work out of your way so that you
+          Automate your entire SEO workflow with intelligent content generation,
           <br />
-          can focus on building your product.
+          keyword optimization, and performance tracking—all in one platform.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -99,14 +106,15 @@ export default function HeroSeobot() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6"
         >
           <ButtonSeobot
             variant="primary"
             size="lg"
             onClick={() => setIsAuthModalOpen(true)}
+            className="text-lg px-10 py-5"
           >
-            Get more SEO traffic
+            Start automating SEO
           </ButtonSeobot>
         </motion.div>
 
@@ -115,31 +123,31 @@ export default function HeroSeobot() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-gray-400 text-sm mb-12"
+          className="text-slate-400 text-sm mb-16 font-mono"
         >
-          * subscriptions start at $49/mo
+          * Plans starting from $49/month
         </motion.p>
 
         {/* Founder Card */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1 }}
-          className="inline-block bg-gray-900 border border-gray-800 rounded-lg p-6 text-left"
+          className="inline-block glass rounded-2xl p-6 md:p-8 text-left glass-hover"
         >
           <div className="flex items-start space-x-4">
-            <div className="w-16 h-16 bg-gray-800 rounded-lg flex-shrink-0" />
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl flex-shrink-0 border border-emerald-500/30"></div>
             <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <span className="text-primary-green font-medium">Got a question?</span>
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-emerald-400 font-semibold">Got a question?</span>
                 <span className="text-2xl">↗</span>
               </div>
-              <p className="text-gray-300 text-sm mb-3">
+              <p className="text-slate-300 text-sm mb-3 leading-relaxed">
                 DM me on{' '}
                 <Link
                   href="https://www.linkedin.com/in/johnrushx/"
                   target="_blank"
-                  className="text-primary-green hover:underline"
+                  className="text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
                 >
                   LinkedIn
                 </Link>
@@ -147,14 +155,14 @@ export default function HeroSeobot() {
                 <Link
                   href="https://twitter.com/johnrushx"
                   target="_blank"
-                  className="text-primary-green hover:underline"
+                  className="text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
                 >
                   Twitter
                 </Link>
                 , or by{' '}
                 <Link
                   href="mailto:john@seobotai.com"
-                  className="text-primary-green hover:underline"
+                  className="text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
                 >
                   Email
                 </Link>
@@ -162,7 +170,7 @@ export default function HeroSeobot() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
       <SeobotAuthModal
         isOpen={isAuthModalOpen}

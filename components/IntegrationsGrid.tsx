@@ -38,9 +38,9 @@ export default function IntegrationsGrid() {
             transition={{ duration: 0.3, delay: index * 0.05 }}
             className="relative group"
           >
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-primary-green transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center h-40">
+            <div className="glass rounded-2xl p-6 glass-hover flex flex-col items-center justify-center h-40">
               {integration.badge && (
-                <div className="absolute -top-2 -right-2 bg-primary-green text-black px-2 py-1 rounded text-xs font-bold">
+                <div className="absolute -top-2 -right-2 bg-emerald-500 text-white px-2 py-1 rounded text-xs font-bold">
                   ■
                 </div>
               )}

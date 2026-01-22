@@ -43,7 +43,7 @@ export default function LanguagePills() {
           {row1.map((language, index) => (
             <div
               key={`${language}-1-${index}`}
-              className="flex-shrink-0 bg-gray-900 border border-gray-800 hover:border-primary-green px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 cursor-default"
+              className="flex-shrink-0 glass hover:border-emerald-500/50 px-6 py-3 rounded-xl text-white font-medium transition-all duration-300 cursor-default hover:scale-105"
             >
               {language}
             </div>
@@ -65,7 +65,7 @@ export default function LanguagePills() {
           {row2.map((language, index) => (
             <div
               key={`${language}-2-${index}`}
-              className="flex-shrink-0 bg-gray-900 border border-gray-800 hover:border-primary-green px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 cursor-default"
+              className="flex-shrink-0 glass hover:border-emerald-500/50 px-6 py-3 rounded-xl text-white font-medium transition-all duration-300 cursor-default hover:scale-105"
             >
               {language}
             </div>
@@ -87,7 +87,7 @@ export default function LanguagePills() {
           {row3.map((language, index) => (
             <div
               key={`${language}-3-${index}`}
-              className="flex-shrink-0 bg-gray-900 border border-gray-800 hover:border-primary-green px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 cursor-default"
+              className="flex-shrink-0 glass hover:border-emerald-500/50 px-6 py-3 rounded-xl text-white font-medium transition-all duration-300 cursor-default hover:scale-105"
             >
               {language}
             </div>
