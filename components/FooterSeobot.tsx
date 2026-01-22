@@ -17,22 +17,22 @@ export default function FooterSeobot() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="mailto:support@seobotai.com"
+                  href="mailto:contact@nuclieos.com"
                   className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]"
                 >
-                  support@seobotai.com
+                  contact@nuclieos.com
                 </Link>
               </li>
               <li>
                 <Link
-                  href="https://x.com/johnrushx"
+                  href="https://www.linkedin.com/company/nuclieos/posts/?feedView=all"
                   target="_blank"
                   className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]"
                 >
-                  x.com/johnrushx
+                  LinkedIn
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="https://x.com/vitalik_may"
                   target="_blank"
@@ -49,7 +49,7 @@ export default function FooterSeobot() {
                 >
                   x.com/seobotai
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -155,7 +155,7 @@ export default function FooterSeobot() {
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
             Copyright © 2025 SEO Bot AI
           </p>
-          <div className="flex items-center text-gray-500 text-sm">
+          {/* <div className="flex items-center text-gray-500 text-sm">
             <span>Built on </span>
             <Link
               href="https://unicornplatform.com"
@@ -164,7 +164,7 @@ export default function FooterSeobot() {
             >
               Unicorn Platform
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

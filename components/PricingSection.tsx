@@ -3,18 +3,63 @@
 import Section from './ui/Section'
 import ButtonSeobot from './ui/ButtonSeobot'
 import Link from 'next/link'
-import { FaCheck } from 'react-icons/fa'
+import { FaCheck, FaRocket, FaCrown, FaBuilding } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 
-const features = [
-  'What you get:',
-  'Fully automated onboarding. Just enter your url and press "go"',
-  'SEObot will research your site, audience and keywords',
-  'SEObot will make a content plan and start producing articles every week',
-  'You can approve/decline or even moderate articles if you want to',
-  "It'll do internal linking for articles and your site pages",
-  'Up to 4000 words, YouTube embeds, Image gen, Google Image insertion, Tables, Lists and more.',
-  'Anti typo hallucination and fact checking system, with citation of sources. Agents runs 100s of tasks & jobs per article.',
+const pricingPlans = [
+  {
+    name: 'Starter',
+    icon: FaRocket,
+    price: 49,
+    description: 'Perfect for small projects and solo creators',
+    features: [
+      'Up to 20 articles per month',
+      'Basic keyword research',
+      'Content optimization tools',
+      'Email support',
+      'Standard templates',
+      'Analytics dashboard',
+    ],
+    popular: false,
+    color: 'emerald',
+  },
+  {
+    name: 'Pro',
+    icon: FaCrown,
+    price: 99,
+    description: 'Ideal for growing businesses and teams',
+    features: [
+      'Up to 100 articles per month',
+      'Advanced keyword research',
+      'AI-powered content generation',
+      'Priority support',
+      'Custom templates',
+      'Advanced analytics',
+      'Internal linking automation',
+      'Multi-language support',
+    ],
+    popular: true,
+    color: 'cyan',
+  },
+  {
+    name: 'Enterprise',
+    icon: FaBuilding,
+    price: 249,
+    description: 'For large organizations with high-volume needs',
+    features: [
+      'Unlimited articles',
+      'Custom AI training',
+      'Dedicated account manager',
+      '24/7 priority support',
+      'White-label options',
+      'Advanced integrations',
+      'Custom workflows',
+      'Team collaboration tools',
+      'API access',
+    ],
+    popular: false,
+    color: 'purple',
+  },
 ]
 
 export default function PricingSection() {
@@ -22,67 +67,122 @@ export default function PricingSection() {
     <Section id="pricing">
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Pricing</p>
-        <h3 className="section-heading">Perhaps the best ROI on the market</h3>
+        <h3 className="section-heading">Choose the plan that fits your needs</h3>
+        <p className="text-slate-400 text-lg mt-4">
+          Flexible pricing designed to scale with your business
+        </p>
       </div>
 
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* Left Side - Quote */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="glass rounded-2xl p-8 glass-hover"
-          >
-            <h3 className="text-white font-bold text-xl mb-4">
-              Built with <span className="text-emerald-400">AI-Powered SEO</span>
-            </h3>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {pricingPlans.map((plan, index) => {
+            const Icon = plan.icon
+            const isPopular = plan.popular
             
-            <div className="space-y-4 text-gray-400">
-              <p>
-                SEObot leverages advanced AI to analyze your website, understand your audience, and create targeted content that ranks.
-              </p>
-              <p>
-                Our users have seen significant traffic growth with automated, high-quality content generation.
-              </p>
-            </div>
-          </motion.div>
+            return (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`relative ${isPopular ? 'md:-mt-4 md:mb-4' : ''}`}
+              >
+                {/* Popular Badge */}
+                {isPopular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
 
-          {/* Right Side - Pricing Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="glass border-emerald-500/50 rounded-2xl p-8 glass-hover"
-          >
-            <div className="text-center mb-6">
-              <div className="text-5xl font-bold text-white mb-2">
-                $<span className="text-7xl text-emerald-400">49</span>
-              </div>
-              <p className="text-gray-400">/month</p>
-              <p className="text-sm text-gray-500 mt-2">Subscriptions start at</p>
-            </div>
+                <div
+                  className={`glass rounded-2xl p-8 h-full flex flex-col transition-all duration-300 ${
+                    isPopular
+                      ? 'border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.3)] scale-105'
+                      : 'glass-hover'
+                  }`}
+                >
+                  {/* Icon and Plan Name */}
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${
+                      plan.color === 'emerald' ? 'from-emerald-500/20 to-emerald-600/20' :
+                      plan.color === 'cyan' ? 'from-cyan-500/20 to-cyan-600/20' :
+                      'from-purple-500/20 to-purple-600/20'
+                    }`}>
+                      <Icon className={`text-2xl ${
+                        plan.color === 'emerald' ? 'text-emerald-400' :
+                        plan.color === 'cyan' ? 'text-cyan-400' :
+                        'text-purple-400'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                      <p className="text-slate-400 text-sm">{plan.description}</p>
+                    </div>
+                  </div>
 
-            <Link href="/app" className="block mb-6">
-              <ButtonSeobot variant="primary" size="lg" className="w-full">
-                Drive SEO traffic →
-              </ButtonSeobot>
-            </Link>
+                  {/* Pricing */}
+                  <div className="mb-6">
+                    <div className="flex items-baseline">
+                      <span className="text-4xl font-bold text-white">$</span>
+                      <span className={`text-6xl font-bold ml-1 ${
+                        plan.color === 'emerald' ? 'text-emerald-400' :
+                        plan.color === 'cyan' ? 'text-cyan-400' :
+                        'text-purple-400'
+                      }`}>
+                        {plan.price}
+                      </span>
+                      <span className="text-slate-400 ml-2">/month</span>
+                    </div>
+                  </div>
 
-            <div className="space-y-3">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <FaCheck className="text-emerald-400 mt-1 flex-shrink-0" />
-                  <p className={`text-sm ${index === 0 ? 'font-bold text-white' : 'text-gray-300'}`}>
-                    {feature}
-                  </p>
+                  {/* CTA Button */}
+                  <Link href="/app" className="block mb-6">
+                    <ButtonSeobot
+                      variant={isPopular ? 'primary' : 'outline'}
+                      size="lg"
+                      className="w-full"
+                    >
+                      Get Started
+                    </ButtonSeobot>
+                  </Link>
+
+                  {/* Features List */}
+                  <div className="space-y-3 flex-1">
+                    {plan.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-start space-x-3">
+                        <FaCheck className={`mt-1 flex-shrink-0 ${
+                          plan.color === 'emerald' ? 'text-emerald-400' :
+                          plan.color === 'cyan' ? 'text-cyan-400' :
+                          'text-purple-400'
+                        }`} />
+                        <p className="text-sm text-slate-300 leading-relaxed">{feature}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </motion.div>
+              </motion.div>
+            )
+          })}
         </div>
+
+        {/* Additional Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-12 text-center"
+        >
+          <p className="text-slate-400 text-sm">
+            All plans include a 14-day free trial. No credit card required.
+          </p>
+          <p className="text-slate-500 text-xs mt-2">
+            Need a custom plan? <Link href="#" className="text-emerald-400 hover:underline">Contact us</Link>
+          </p>
+        </motion.div>
       </div>
     </Section>
   )

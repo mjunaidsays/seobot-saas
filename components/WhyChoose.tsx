@@ -8,10 +8,10 @@ export default function WhyChoose() {
   return (
     <Section>
       <div className="text-center mb-16">
-        <p className="section-title">{'//'} Why choose SEObot?</p>
-        <h3 className="section-heading">SEO for project-busy founders</h3>
+        <p className="section-title">{'//'} Why choose our platform?</p>
+        <h3 className="section-heading">Built for modern content teams</h3>
         <p className="text-gray-400 text-lg">
-          SEO Bot is an all-in-one SEO AI agent that saves you time and effort.
+          Streamline your content workflow with intelligent automation and powerful insights.
         </p>
       </div>
 
@@ -27,17 +27,17 @@ export default function WhyChoose() {
             <div className="w-12 h-12 bg-gray-800 rounded-full flex-shrink-0" />
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
-                <span className="font-semibold text-white">Santiago Poli</span>
-                <span className="text-gray-500 text-sm">@santiagopoli</span>
+                <span className="font-semibold text-white">Alex Morgan</span>
+                <span className="text-gray-500 text-sm">@alexmorgan</span>
               </div>
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-white">
-                  Hey John, I need to give you an update on that!
+                  This platform transformed our content operations!
                 </h3>
                 <div className="space-y-2 text-gray-300">
-                  <p>1. <span className="text-emerald-400 font-semibold">500 clicks a day</span></p>
-                  <p>2. The cost was <span className="text-emerald-400 font-semibold">$1000 in article</span></p>
-                  <p>3. We closed a <span className="text-emerald-400 font-semibold">$6500 client</span> when the business wasn&apos;t even operational.</p>
+                  <p>1. <span className="text-emerald-400 font-semibold">3x increase in organic traffic</span></p>
+                  <p>2. Reduced content creation time by <span className="text-emerald-400 font-semibold">80%</span></p>
+                  <p>3. Generated <span className="text-emerald-400 font-semibold">150+ articles</span> in the first quarter with minimal oversight.</p>
                 </div>
               </div>
             </div>

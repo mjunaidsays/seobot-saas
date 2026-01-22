@@ -11,10 +11,10 @@ export default function Testimonials() {
   return (
     <Section className="overflow-hidden">
       <div className="text-center mb-16">
-        <p className="section-title">{'//'} Wall of love 😍</p>
-        <h3 className="section-heading">Thousands of users</h3>
+        <p className="section-title">{'//'} Customer success stories</p>
+        <h3 className="section-heading">Trusted by content teams worldwide</h3>
         <p className="text-gray-400 text-lg">
-          used SEObot and brought traffic to their blogs
+          See how businesses are transforming their content operations
         </p>
       </div>
 

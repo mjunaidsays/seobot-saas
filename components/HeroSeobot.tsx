@@ -50,7 +50,7 @@ export default function HeroSeobot() {
           transition={{ duration: 0.6 }}
           className="text-emerald-400 text-sm md:text-base font-mono font-bold mb-8 tracking-tight"
         >
-          {'//'} Powered by AI and GPT agents
+          {'//'} Next-generation SEO automation
         </motion.p>
 
         {/* Main Heading with Typing Animation */}
@@ -96,9 +96,9 @@ export default function HeroSeobot() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-slate-300 text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed"
         >
-          SEObot takes 100% of SEO work out of your way so that you
+          Automate your entire SEO workflow with intelligent content generation,
           <br />
-          can focus on building your product.
+          keyword optimization, and performance tracking—all in one platform.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -114,7 +114,7 @@ export default function HeroSeobot() {
             onClick={() => setIsAuthModalOpen(true)}
             className="text-lg px-10 py-5"
           >
-            Get more SEO traffic
+            Start automating SEO
           </ButtonSeobot>
         </motion.div>
 
@@ -125,7 +125,7 @@ export default function HeroSeobot() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-slate-400 text-sm mb-16 font-mono"
         >
-          * subscriptions start at $49/mo
+          * Plans starting from $49/month
         </motion.p>
 
         {/* Founder Card */}
