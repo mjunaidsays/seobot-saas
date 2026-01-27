@@ -6,6 +6,7 @@ import { FaTimes } from 'react-icons/fa'
 import ButtonSeobot from '../ui/ButtonSeobot'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { trackEvent, identifyUser } from '@/lib/posthog'
 
 interface SeobotAuthModalProps {
   isOpen: boolean
@@ -71,6 +72,11 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
             
             if (result.success) {
               console.log('✓ Existing user signed in successfully')
+              // Track sign-in event
+              trackEvent('user_signed_in', {
+                method: 'quick_access',
+                email: email,
+              })
               // Session is set via cookies from server response
               // Refresh the page to ensure session is loaded
               onClose()
@@ -115,6 +121,19 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
       // Check if we got a session (instant access)
       if (authData?.session) {
         console.log('✓ Session created immediately - redirecting to /app')
+        // Track sign-up event
+        trackEvent('user_signed_up', {
+          method: 'quick_access',
+          email: email,
+          user_id: authData.user?.id,
+        })
+        // Identify user in PostHog
+        if (authData.user?.id) {
+          identifyUser(authData.user.id, {
+            email: email,
+            name: name,
+          })
+        }
         // Ensure session is properly set in cookies
         // The SSR client should handle this automatically, but we'll refresh to be sure
         onClose()

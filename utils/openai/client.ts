@@ -2,18 +2,27 @@ import OpenAI from 'openai'
 import * as cheerio from 'cheerio'
 import { ResearchData, PlanItem } from '@/lib/types/api'
 
-if (!process.env.NEXT_PUBLIC_OPENROUTER_API_KEY) {
-  throw new Error('NEXT_PUBLIC_OPENROUTER_API_KEY environment variable is not set')
-}
+// Lazy initialization to avoid build-time errors
+let client: OpenAI | null = null
 
-const client = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENROUTER_API_KEY,
-  baseURL: 'https://openrouter.ai/api/v1',
-  defaultHeaders: {
-    'HTTP-Referer': 'https://seobot-saas.com', // Optional, for OpenRouter rankings
-    'X-Title': 'SEObot SaaS', // Optional, for OpenRouter rankings
-  },
-})
+const getClient = (): OpenAI => {
+  if (!process.env.NEXT_PUBLIC_OPENROUTER_API_KEY) {
+    throw new Error('NEXT_PUBLIC_OPENROUTER_API_KEY environment variable is not set')
+  }
+  
+  if (!client) {
+    client = new OpenAI({
+      apiKey: process.env.NEXT_PUBLIC_OPENROUTER_API_KEY,
+      baseURL: 'https://openrouter.ai/api/v1',
+      defaultHeaders: {
+        'HTTP-Referer': 'https://seobot-saas.com', // Optional, for OpenRouter rankings
+        'X-Title': 'SEObot SaaS', // Optional, for OpenRouter rankings
+      },
+    })
+  }
+  
+  return client
+}
 
 /**
  * Extract main content from URL using cheerio (replaces BeautifulSoup)
@@ -153,7 +162,7 @@ export async function researchSite(url: string): Promise<ResearchData> {
     }
     `
 
-    const completion = await client.chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: 'gpt-5-nano',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
@@ -193,7 +202,7 @@ export async function generateContentPlan(
     }
     `
 
-  const completion = await client.chat.completions.create({
+  const completion = await getClient().chat.completions.create({
     model: 'gpt-5-nano',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
@@ -260,7 +269,7 @@ export async function updateContentPlan(
     }
     `
 
-  const completion = await client.chat.completions.create({
+  const completion = await getClient().chat.completions.create({
     model: 'gpt-5-nano',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
@@ -344,7 +353,7 @@ export async function generateArticle(
     `
 
   try {
-    const completion = await client.chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: 'gpt-5-nano',
       messages: [
         {
@@ -367,4 +376,4 @@ export async function generateArticle(
   }
 }
 
-export { client }
+export { getClient }

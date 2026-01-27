@@ -10,6 +10,7 @@ import { useChat } from '@/hooks/useChat'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { FaSignOutAlt } from 'react-icons/fa'
+import { identifyUser, trackEvent, resetPostHog } from '@/lib/posthog'
 
 export default function AppPage() {
   const [autopilot, setAutopilot] = useState(false)
@@ -54,6 +55,12 @@ export default function AppPage() {
         setUser(user)
         setIsAuthenticated(true)
         
+        // Identify user in PostHog
+        identifyUser(user.id, {
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email?.split('@')[0],
+        })
+        
         // Fetch user profile from users table
         const { data: profile, error: profileError } = await supabase
           .from('users')
@@ -90,6 +97,13 @@ export default function AppPage() {
 
   const handleLogout = async () => {
     const supabase = createClient()
+    
+    // Track logout event
+    trackEvent('user_logged_out')
+    
+    // Reset PostHog session
+    resetPostHog()
+    
     await supabase.auth.signOut()
     router.push('/')
     router.refresh()
