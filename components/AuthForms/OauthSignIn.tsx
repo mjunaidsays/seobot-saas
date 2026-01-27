@@ -5,6 +5,7 @@ import { signInWithOAuth } from '@/utils/auth-helpers/client';
 import { type Provider } from '@supabase/supabase-js';
 import Image from 'next/image';
 import { useState } from 'react';
+import { trackEvent } from '@/lib/posthog';
 
 type OAuthProviders = {
   name: Provider;
@@ -23,6 +24,15 @@ export default function OauthSignIn() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true); // Disable the button while the request is being handled
+    
+    const formData = new FormData(e.currentTarget);
+    const provider = formData.get('provider') as string;
+    
+    // Track OAuth sign-in attempt
+    trackEvent('oauth_sign_in_initiated', {
+      provider: provider,
+    });
+    
     await signInWithOAuth(e);
     setIsSubmitting(false);
   };

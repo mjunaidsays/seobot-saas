@@ -6,6 +6,7 @@ import { WebsiteData, Headline } from '@/app/app/types/website'
 import { apiClient } from '@/lib/api'
 import { mapAnalyzeResponseToWebsiteData } from '@/lib/mappers/websiteMapper'
 import { AnalyzeResponse, PlanItem, ResearchData, GenerateRequest, ChatRequest, ChatResponse } from '@/lib/types/api'
+import { trackEvent } from '@/lib/posthog'
 
 // URL detection regex pattern
 const URL_PATTERN = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
@@ -120,6 +121,12 @@ export function useChat() {
     setWebsiteUrl(url)
     setError(null)
 
+    // Track analysis started event
+    trackEvent('website_analysis_started', {
+      website_url: url,
+      domain: extractDomain(url),
+    })
+
     // Add analysis start message
     addMessage(`seobot: ${extractDomain(url)} is on board`)
 
@@ -139,6 +146,14 @@ export function useChat() {
       setIsAnalyzing(false)
       setAnalysisComplete(true)
       setIsTyping(false)
+
+      // Track analysis completed event
+      trackEvent('website_analysis_completed', {
+        website_url: url,
+        domain: extractDomain(url),
+        plan_items_count: response.plan.length,
+        session_id: response.session_id,
+      })
 
       // Add analysis complete messages with delays
       const addMessageWithDelay = (messageContent: string, delay: number) => {
@@ -169,6 +184,13 @@ export function useChat() {
 
     setIsGenerating(true)
     setError(null)
+    
+    // Track content generation started event
+    trackEvent('content_generation_started', {
+      session_id: sessionId,
+      articles_count: planItems.length,
+    })
+    
     addMessage(`seobot: Starting implementation... I'll begin creating SEO-optimized content for your website.`)
 
     const articles: GeneratedArticle[] = []
@@ -208,6 +230,13 @@ export function useChat() {
 
       setGeneratedArticles(articles)
       
+      // Track content generation completed event
+      trackEvent('content_generation_completed', {
+        session_id: sessionId,
+        articles_count: articles.length,
+        success: articles.length > 0,
+      })
+      
       if (articles.length > 0) {
         addMessage(`seobot: All articles generated successfully! ${articles.length} article(s) ready.`)
       } else {
@@ -235,6 +264,14 @@ export function useChat() {
 
     // Check if message contains a URL
     const detectedUrl = extractURL(content)
+
+    // Track chat message sent event (only for non-URL messages after analysis)
+    if (!detectedUrl && analysisComplete && sessionId) {
+      trackEvent('chat_message_sent', {
+        session_id: sessionId,
+        message_length: content.length,
+      })
+    }
     
     if (detectedUrl && !analysisComplete && !isAnalyzing) {
       // Start website analysis

@@ -9,6 +9,7 @@ import { JetBrains_Mono as FontMono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import dynamic from 'next/dynamic';
 import { Analytics } from '@vercel/analytics/react';
+import {PostHogProviderComponent} from '@/components/PostHogProvider';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -75,22 +76,24 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       >
         <CrispWithNoSSR />
         <MatrixRain />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <main
-            id="skip"
-            className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
+        <PostHogProviderComponent>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
           >
-            {children}
-          </main>
-          <Suspense>
-            <Toaster />
-          </Suspense>
-        </ThemeProvider>
+            <main
+              id="skip"
+              className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
+            >
+              {children}
+            </main>
+            <Suspense>
+              <Toaster />
+            </Suspense>
+          </ThemeProvider>
+        </PostHogProviderComponent>
         <Analytics />
       </body>
     </html>

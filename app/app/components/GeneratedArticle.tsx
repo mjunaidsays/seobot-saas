@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FaCopy, FaDownload, FaTimes } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { trackEvent } from '@/lib/posthog'
 
 export interface GeneratedArticle {
   title: string
@@ -44,6 +45,12 @@ export default function GeneratedArticle({ article, index }: GeneratedArticlePro
 
   const handleOpenFullscreen = () => {
     setIsFullscreen(true)
+    // Track article viewed event
+    trackEvent('article_viewed', {
+      article_title: article.title,
+      word_count: article.word_count,
+      keywords_count: article.keywords.length,
+    })
   }
 
   const handleCloseFullscreen = () => {
