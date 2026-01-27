@@ -2,12 +2,17 @@ import OpenAI from 'openai'
 import * as cheerio from 'cheerio'
 import { ResearchData, PlanItem } from '@/lib/types/api'
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY environment variable is not set')
+if (!process.env.NEXT_PUBLIC_OPENROUTER_API_KEY) {
+  throw new Error('NEXT_PUBLIC_OPENROUTER_API_KEY environment variable is not set')
 }
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.NEXT_PUBLIC_OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
+  defaultHeaders: {
+    'HTTP-Referer': 'https://seobot-saas.com', // Optional, for OpenRouter rankings
+    'X-Title': 'SEObot SaaS', // Optional, for OpenRouter rankings
+  },
 })
 
 /**
@@ -20,16 +25,16 @@ async function extractContentFromUrl(url: string): Promise<string> {
     })
     const html = await response.text()
     const $ = cheerio.load(html)
-    
+
     // Remove script and style elements
     $('script, style').remove()
-    
+
     // Extract text from paragraphs
     const paragraphs = $('p')
       .map((_, el) => $(el).text())
       .get()
       .join(' ')
-    
+
     return paragraphs.slice(0, 8000) // Limit to avoid huge inputs
   } catch (error) {
     console.error('Error extracting content:', error)
@@ -42,37 +47,37 @@ async function extractContentFromUrl(url: string): Promise<string> {
  */
 export async function researchSite(url: string): Promise<ResearchData> {
   console.log(`Starting site research for: ${url}`)
-  
+
   try {
     const parsedUrl = new URL(url)
     const baseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`
-    
+
     // Helper to get absolute internal links
     const getInternalLinks = (html: string, base: string): string[] => {
       const $ = cheerio.load(html)
       const links: string[] = []
-      
+
       $('a[href]').each((_, el) => {
         const href = $(el).attr('href')
         if (!href) return
-        
+
         if (href.startsWith('/')) {
           links.push(`${base.replace(/\/$/, '')}/${href.replace(/^\//, '')}`)
         } else if (href.includes(base)) {
           links.push(href)
         }
       })
-      
+
       return Array.from(new Set(links)).slice(0, 10) // Top 10 internal links
     }
-    
+
     // Step 1: Homepage
     const response = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
     })
     const html = await response.text()
     const $ = cheerio.load(html)
-    
+
     const homepageTitle = $('title').text() || ''
     const metaDesc = $('meta[name="description"]').attr('content') || ''
     const paragraphs = $('p')
@@ -81,20 +86,20 @@ export async function researchSite(url: string): Promise<ResearchData> {
       .get()
       .slice(0, 10)
       .join(' ')
-    
+
     const internalLinks = getInternalLinks(html, url)
-    
+
     // Step 2: Crawl sub-pages
     const siteMap: Array<{ url: string; title: string }> = [
       { url, title: homepageTitle },
     ]
     const subContent: string[] = []
-    
+
     const priorityKeywords = ['about', 'pricing', 'product', 'service', 'feature']
     const toCrawl = internalLinks
       .filter((link) => priorityKeywords.some((k) => link.toLowerCase().includes(k)))
       .slice(0, 3) // Max 3 sub-pages
-    
+
     for (const subUrl of toCrawl) {
       try {
         const subRes = await fetch(subUrl, {
@@ -104,7 +109,7 @@ export async function researchSite(url: string): Promise<ResearchData> {
         const sub$ = cheerio.load(subHtml)
         const subTitle = sub$('title').text() || subUrl
         siteMap.push({ url: subUrl, title: subTitle })
-        
+
         const subP = sub$('p')
         const subText = subP
           .map((_, el) => sub$(el).text())
@@ -116,7 +121,7 @@ export async function researchSite(url: string): Promise<ResearchData> {
         continue
       }
     }
-    
+
     const researchInput = `
     Homepage Title: ${homepageTitle}
     Homepage Description: ${metaDesc}
@@ -125,7 +130,7 @@ export async function researchSite(url: string): Promise<ResearchData> {
     Sub-page Data:
     ${subContent.join('\n')}
     `
-    
+
     const prompt = `
     Analyze the following website data and provide a comprehensive research report in JSON format.
     Focus on:
@@ -147,13 +152,13 @@ export async function researchSite(url: string): Promise<ResearchData> {
         "site_map": ${JSON.stringify(siteMap)}
     }
     `
-    
+
     const completion = await client.chat.completions.create({
       model: 'gpt-5-nano',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
     })
-    
+
     const result = JSON.parse(completion.choices[0].message.content || '{}')
     return result as ResearchData
   } catch (error) {
@@ -187,13 +192,13 @@ export async function generateContentPlan(
         ]
     }
     `
-  
+
   const completion = await client.chat.completions.create({
     model: 'gpt-5-nano',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
   })
-  
+
   const result = JSON.parse(completion.choices[0].message.content || '{}')
   return result.plan || []
 }
@@ -254,13 +259,13 @@ export async function updateContentPlan(
         "plan": []
     }
     `
-  
+
   const completion = await client.chat.completions.create({
     model: 'gpt-5-nano',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
   })
-  
+
   const result = JSON.parse(completion.choices[0].message.content || '{}')
   return {
     answer: result.answer || '',
@@ -278,7 +283,7 @@ export async function generateArticle(
   researchData: ResearchData
 ): Promise<string> {
   console.log(`Starting generation for '${topic}'`)
-  
+
   const siteMapStr = researchData.site_map
     .map((p) => `- Title: ${p.title} | URL: ${p.url}`)
     .join('\n')
@@ -352,7 +357,7 @@ export async function generateArticle(
       max_completion_tokens: 4000,
       reasoning_effort: 'low',
     })
-    
+
     const finalArticle = completion.choices[0].message.content?.trim() || ''
     console.log(`Successfully generated article for: ${topic}`)
     return finalArticle
