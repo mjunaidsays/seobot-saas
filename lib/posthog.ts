@@ -47,14 +47,34 @@ export const getPostHog = () => {
   return null;
 };
 
+// Ensure product_name is always registered before any PostHog call
+// This acts as a safety net to ensure properties are included even if register() wasn't called
+const ensureProductName = () => {
+  const ph = getPostHog();
+  if (ph && ph.__loaded) {
+    // Re-register to ensure it's set (this adds to all future events)
+    ph.register({
+      product_name: PRODUCT_NAME,
+    });
+  }
+};
+
 // Identify user with PostHog
 export const identifyUser = (userId: string, properties?: Record<string, any>) => {
   const ph = getPostHog();
   if (!ph) return;
 
+  // Ensure product_name is registered before identify
+  ensureProductName();
+
   ph.identify(userId, {
     product_name: PRODUCT_NAME,
     ...properties,
+  });
+  
+  // Also set as person property to ensure it appears in Identify events
+  ph.setPersonProperties({
+    product_name: PRODUCT_NAME,
   });
 };
 
@@ -62,6 +82,9 @@ export const identifyUser = (userId: string, properties?: Record<string, any>) =
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
   const ph = getPostHog();
   if (!ph) return;
+
+  // Ensure product_name is registered before capture (for autocapture events)
+  ensureProductName();
 
   ph.capture(eventName, {
     product_name: PRODUCT_NAME,
@@ -73,6 +96,9 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
 export const trackPageView = (path?: string) => {
   const ph = getPostHog();
   if (!ph) return;
+
+  // Ensure product_name is registered before capture
+  ensureProductName();
 
   ph.capture('$pageview', {
     product_name: PRODUCT_NAME,

@@ -6,11 +6,13 @@ import { Group, Panel, Separator } from 'react-resizable-panels'
 import ChatInterface from './components/ChatInterface'
 import WebsiteDataPanel from './components/WebsiteDataPanel'
 import GeneratedArticle from './components/GeneratedArticle'
+import ConversationHistory from './components/ConversationHistory'
 import { useChat } from '@/hooks/useChat'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
-import { FaSignOutAlt } from 'react-icons/fa'
+import { FaSignOutAlt, FaBars, FaHistory } from 'react-icons/fa'
 import { identifyUser, trackEvent, resetPostHog } from '@/lib/posthog'
+import { ConversationProject } from '@/utils/database/conversations'
 
 export default function AppPage() {
   const [autopilot, setAutopilot] = useState(false)
@@ -18,7 +20,16 @@ export default function AppPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [userProfile, setUserProfile] = useState<any>(null)
+  const [isTrialMode, setIsTrialMode] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const router = useRouter()
+  
+  // Initialize useChat hook
+  const chatHookResult = useChat({
+    userId: user?.id || null,
+    isTrialMode,
+  })
+  
   const { 
     messages, 
     isTyping, 
@@ -29,8 +40,11 @@ export default function AppPage() {
     handleProceed,
     generatedArticles,
     isGenerating,
-    error
-  } = useChat()
+    error,
+    loadConversation,
+    resetConversation,
+    currentProjectId
+  } = chatHookResult
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -55,10 +69,15 @@ export default function AppPage() {
         setUser(user)
         setIsAuthenticated(true)
         
+        // Check if user is in trial mode
+        const trialMode = user.user_metadata?.trial_mode === true
+        setIsTrialMode(trialMode)
+        
         // Identify user in PostHog
         identifyUser(user.id, {
           email: user.email,
           name: user.user_metadata?.full_name || user.email?.split('@')[0],
+          trial_mode: trialMode,
         })
         
         // Fetch user profile from users table
@@ -145,6 +164,25 @@ export default function AppPage() {
       {user && (
         <div className="relative z-20 bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between">
           <div className="flex items-center space-x-3">
+            {/* Sidebar Toggle - Only show for non-trial users */}
+            {!isTrialMode && (
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 lg:hidden"
+                aria-label="Toggle sidebar"
+              >
+                <FaBars className="w-5 h-5" />
+              </button>
+            )}
+            {!isTrialMode && (
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="hidden lg:flex text-gray-400 hover:text-white transition-colors p-2 -ml-2"
+                aria-label="Toggle sidebar"
+              >
+                <FaHistory className="w-5 h-5" />
+              </button>
+            )}
             <div className="w-8 h-8 bg-primary-green rounded-full flex items-center justify-center text-black font-bold text-sm">
               {(userProfile?.full_name || user.email || 'U').charAt(0).toUpperCase()}
             </div>
@@ -155,19 +193,43 @@ export default function AppPage() {
               <p className="text-gray-400 text-xs">{user.email}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-800"
-            title="Sign out"
-          >
-            <FaSignOutAlt className="w-4 h-4" />
-            <span className="text-xs">Sign out</span>
-          </button>
+          <div className="flex items-center space-x-2">
+            {isTrialMode && (
+              <div className="bg-yellow-500/10 border border-yellow-500/50 text-yellow-400 px-3 py-1 rounded text-xs mr-2">
+                Trial Mode - Progress won't be saved
+              </div>
+            )}
+            <button
+              onClick={handleLogout}
+              className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-800"
+              title="Sign out"
+            >
+              <FaSignOutAlt className="w-4 h-4" />
+              <span className="text-xs hidden sm:inline">Sign out</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Conversation History Sidebar - Only for non-trial users */}
+      {!isTrialMode && (
+        <div className={`fixed lg:relative inset-0 lg:inset-auto ${isSidebarOpen ? 'z-40' : 'z-30'}`}>
+          <ConversationHistory
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+            onSelectConversation={(project: ConversationProject) => {
+              loadConversation(project)
+            }}
+            onNewConversation={() => {
+              resetConversation()
+            }}
+            currentProjectId={currentProjectId || undefined}
+          />
         </div>
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
+      <div className={`relative z-10 flex-1 flex flex-col overflow-hidden ${!isTrialMode && isSidebarOpen ? 'lg:ml-[300px]' : ''} transition-all duration-300`}>
         <AnimatePresence mode="wait">
           {!analysisComplete ? (
             // Single centered chat (initial state)

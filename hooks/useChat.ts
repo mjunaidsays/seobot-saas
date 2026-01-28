@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Message } from '@/app/app/components/ChatMessage'
 import { WebsiteData, Headline } from '@/app/app/types/website'
 import { apiClient } from '@/lib/api'
 import { mapAnalyzeResponseToWebsiteData } from '@/lib/mappers/websiteMapper'
 import { AnalyzeResponse, PlanItem, ResearchData, GenerateRequest, ChatRequest, ChatResponse } from '@/lib/types/api'
 import { trackEvent } from '@/lib/posthog'
+import { saveConversation, ConversationProject } from '@/utils/database/conversations'
+import { createClient } from '@/utils/supabase/client'
 
 // URL detection regex pattern
 const URL_PATTERN = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
@@ -73,7 +75,15 @@ export interface GeneratedArticle {
   word_count: number
 }
 
-export function useChat() {
+interface UseChatOptions {
+  userId?: string | null
+  isTrialMode?: boolean
+  projectId?: string | null
+}
+
+export function useChat(options: UseChatOptions = {}) {
+  const { userId, isTrialMode = false, projectId } = options
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -105,6 +115,17 @@ export function useChat() {
   const [generatedArticles, setGeneratedArticles] = useState<GeneratedArticle[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(projectId || null)
+
+  const saveConversationToDB = useCallback(async (messagesToSave: Message[]) => {
+    if (!isTrialMode && userId && sessionId && websiteUrl) {
+      try {
+        await saveConversation(userId, sessionId, websiteUrl, messagesToSave, websiteData, researchData, planItems)
+      } catch (err) {
+        console.error('Error saving conversation:', err)
+      }
+    }
+  }, [isTrialMode, userId, sessionId, websiteUrl, websiteData, researchData, planItems])
 
   const addMessage = useCallback((content: string, type: 'user' | 'bot' | 'system' = 'bot') => {
     const message: Message = {
@@ -113,8 +134,13 @@ export function useChat() {
       content,
       timestamp: new Date(),
     }
-    setMessages((prev) => [...prev, message])
-  }, [])
+    setMessages((prev) => {
+      const newMessages = [...prev, message]
+      // Save to database asynchronously
+      saveConversationToDB(newMessages)
+      return newMessages
+    })
+  }, [saveConversationToDB])
 
   const startWebsiteAnalysis = useCallback(async (url: string) => {
     setIsAnalyzing(true)
@@ -142,6 +168,20 @@ export function useChat() {
       // Map response to WebsiteData format
       const mappedData = mapAnalyzeResponseToWebsiteData(response, url)
       setWebsiteData(mappedData)
+
+      // Save to database if not trial mode and user is authenticated
+      if (!isTrialMode && userId && response.session_id) {
+        setCurrentProjectId(response.session_id)
+        saveConversation(
+          userId,
+          response.session_id,
+          url,
+          messages,
+          mappedData,
+          response.research_data,
+          response.plan
+        ).catch((err) => console.error('Error saving initial conversation:', err))
+      }
 
       setIsAnalyzing(false)
       setAnalysisComplete(true)
@@ -310,16 +350,37 @@ export function useChat() {
           setPlanItems(chatResponse.plan)
 
           // Update websiteData headlines if websiteData exists
+          let updatedWebsiteData = websiteData
           if (websiteData) {
             const updatedHeadlines = updateHeadlinesFromPlan(chatResponse.plan)
-            setWebsiteData({
+            updatedWebsiteData = {
               ...websiteData,
               headlines: updatedHeadlines,
-            })
+            }
+            setWebsiteData(updatedWebsiteData)
           }
 
           // Display bot's answer
           addMessage(`seobot: ${chatResponse.answer}`)
+
+          // Save updated conversation with new plan after a brief delay to ensure state is updated
+          if (!isTrialMode && userId && sessionId && websiteUrl) {
+            setTimeout(async () => {
+              // Get current state values
+              setMessages((currentMessages) => {
+                saveConversation(
+                  userId,
+                  sessionId,
+                  websiteUrl,
+                  currentMessages,
+                  updatedWebsiteData || websiteData,
+                  researchData,
+                  chatResponse.plan
+                ).catch((err) => console.error('Error saving conversation update:', err))
+                return currentMessages
+              })
+            }, 300)
+          }
         } catch (err) {
           const errorMessage = err instanceof Error ? err.message : 'Failed to process chat message'
           setError(errorMessage)
@@ -339,7 +400,103 @@ export function useChat() {
       addMessage("Please enter your website URL to begin the analysis.")
       setIsTyping(false)
     }, 500)
-  }, [isAnalyzing, analysisComplete, sessionId, websiteData, startWebsiteAnalysis, handleProceed, addMessage])
+  }, [isAnalyzing, analysisComplete, sessionId, websiteData, startWebsiteAnalysis, handleProceed, addMessage, isTrialMode, userId, researchData, planItems])
+
+  // Function to load conversation from project
+  const loadConversation = useCallback((project: ConversationProject) => {
+    if (project.chat_history && project.chat_history.length > 0) {
+      // Convert chat_history to Message[] format
+      // Handle both Message[] format (with 'type') and API format (with 'role')
+      const loadedMessages: Message[] = project.chat_history.map((msg: any, index: number) => {
+        // If already in Message format
+        if (msg.type) {
+          return {
+            ...msg,
+            timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp || Date.now()),
+          }
+        }
+        // Convert from API format (role/content) to Message format
+        if (msg.role) {
+          return {
+            id: msg.id || `msg-${Date.now()}-${index}`,
+            type: msg.role === 'assistant' ? 'bot' : msg.role === 'user' ? 'user' : 'system',
+            content: msg.content || '',
+            timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp || Date.now()),
+          }
+        }
+        // Fallback
+        return {
+          id: `msg-${Date.now()}-${index}`,
+          type: 'bot' as const,
+          content: msg.content || '',
+          timestamp: new Date(),
+        }
+      })
+      setMessages(loadedMessages)
+    }
+
+    if (project.url) {
+      setWebsiteUrl(project.url)
+    }
+
+    if (project.research_data) {
+      setResearchData(project.research_data)
+    }
+
+    if (project.plan && project.plan.length > 0) {
+      setPlanItems(project.plan)
+      
+      // Reconstruct websiteData from plan
+      if (project.url) {
+        const mappedData = mapAnalyzeResponseToWebsiteData(
+          {
+            session_id: project.id,
+            research_data: project.research_data || {},
+            plan: project.plan,
+          } as AnalyzeResponse,
+          project.url
+        )
+        setWebsiteData(mappedData)
+      }
+    }
+
+    setSessionId(project.id)
+    setCurrentProjectId(project.id)
+    setAnalysisComplete(!!(project.plan && project.plan.length > 0))
+  }, [])
+
+  // Function to reset/start new conversation
+  const resetConversation = useCallback(() => {
+    setMessages([
+      {
+        id: '1',
+        type: 'bot',
+        content: "Hi there! I'm SEObot, your AI SEO assistant.",
+        timestamp: new Date(),
+      },
+      {
+        id: '2',
+        type: 'bot',
+        content: "I can help increase 🚀 your website's organic traffic. No manual work required from you!",
+        timestamp: new Date(),
+      },
+      {
+        id: '3',
+        type: 'bot',
+        content: "Ready to start? Enter your website URL to begin!",
+        timestamp: new Date(),
+      },
+    ])
+    setWebsiteUrl(null)
+    setAnalysisComplete(false)
+    setWebsiteData(null)
+    setSessionId(null)
+    setResearchData(null)
+    setPlanItems([])
+    setGeneratedArticles([])
+    setCurrentProjectId(null)
+    setError(null)
+  }, [])
 
   return {
     messages,
@@ -353,5 +510,8 @@ export function useChat() {
     generatedArticles,
     isGenerating,
     error,
+    loadConversation,
+    resetConversation,
+    currentProjectId,
   }
 }

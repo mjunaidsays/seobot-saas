@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
       options: {
         data: {
           full_name: name,
+          trial_mode: true, // Mark as trial user
         },
       },
     })
@@ -63,11 +64,12 @@ export async function POST(request: NextRequest) {
       const existingUser = userData?.users?.find(u => u.email === email)
 
       if (existingUser) {
-        // Reset password using admin API
+        // Reset password using admin API and mark as trial user
         await adminClient.auth.admin.updateUserById(existingUser.id, {
           password: deterministicPassword,
           user_metadata: {
             full_name: name,
+            trial_mode: true, // Mark as trial user
           },
         })
 
