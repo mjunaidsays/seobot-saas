@@ -6,7 +6,7 @@ export default function FooterSeobot() {
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Logo */}
         <div className="mb-8">
-          <span className="text-2xl font-bold text-emerald-400 tracking-tight">seobot</span>
+          <span className="text-2xl font-bold text-emerald-400 tracking-tight">Up Rank</span>
         </div>
 
         {/* Footer Content */}
@@ -153,7 +153,7 @@ export default function FooterSeobot() {
         {/* Copyright */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
-            Copyright © 2025 SEO Bot AI
+            Copyright © 2025 Up Rank AI
           </p>
           {/* <div className="flex items-center text-gray-500 text-sm">
             <span>Built on </span>

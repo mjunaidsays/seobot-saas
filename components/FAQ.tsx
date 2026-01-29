@@ -19,7 +19,7 @@ export default function FAQ() {
         <p className="section-title">{'//'} FAQ</p>
         <h3 className="section-heading">Got any questions?</h3>
         <p className="text-gray-400 text-lg">
-          Find answers to common questions about SEObot.
+          Find answers to common questions about Up Rank.
         </p>
         <p className="text-gray-500 mt-2">Or find an answer in the faq below 👇</p>
       </div>

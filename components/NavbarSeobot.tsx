@@ -16,7 +16,7 @@ export default function NavbarSeobot() {
             {/* Logo */}
             <Link href="/" className="flex items-center group">
               <span className="text-2xl md:text-3xl font-bold text-emerald-400 tracking-tight transition-all duration-300 group-hover:text-emerald-300 group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
-                seobot
+                Up Rank
               </span>
             </Link>
 
