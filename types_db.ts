@@ -299,6 +299,44 @@ export type Database = {
           },
         ]
       }
+      guest_users: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          created_at: string
+          last_seen_at: string
+          source: string | null
+          converted_user_id: string | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          full_name?: string | null
+          created_at?: string
+          last_seen_at?: string
+          source?: string | null
+          converted_user_id?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          created_at?: string
+          last_seen_at?: string
+          source?: string | null
+          converted_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_users_converted_user_fk"
+            columns: ["converted_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

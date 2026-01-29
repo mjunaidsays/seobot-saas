@@ -65,17 +65,49 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Convert chat_history from Message[] format (with 'type') to format expected by updateContentPlan (with 'role')
+    const chatHistoryForAPI = (project.chat_history || []).map((msg: any) => {
+      // Handle both Message format (type) and API format (role)
+      if (msg.type) {
+        return {
+          role: msg.type === 'bot' ? 'assistant' : msg.type === 'user' ? 'user' : 'system',
+          content: msg.content || '',
+        }
+      }
+      // Already in correct format
+      return {
+        role: msg.role || 'user',
+        content: msg.content || '',
+      }
+    })
+
     // Update content plan
     const result = await updateContentPlan(
       project.research_data,
       project.plan,
       message,
-      project.chat_history
+      chatHistoryForAPI
     )
 
-    // Update chat history
+    // Update chat history - convert to API format (role/content) for updateProject
+    const existingHistory = (project.chat_history || []).map((msg: any) => {
+      // If already in API format (has role), keep it
+      if (msg.role) {
+        return { role: msg.role, content: msg.content || '' }
+      }
+      // Convert from Message format (has type) to API format
+      if (msg.type) {
+        return {
+          role: msg.type === 'bot' ? 'assistant' : msg.type === 'user' ? 'user' : 'system',
+          content: msg.content || '',
+        }
+      }
+      // Fallback
+      return { role: 'user', content: msg.content || '' }
+    })
+
     const updatedHistory = [
-      ...project.chat_history,
+      ...existingHistory,
       { role: 'user', content: message },
       { role: 'assistant', content: result.answer },
     ]

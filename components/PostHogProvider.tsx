@@ -107,10 +107,24 @@ export function PostHogProviderComponent({ children }: { children: React.ReactNo
             disable_session_recording: false,
             debug: true,
             loaded: (posthogInstance) => {
-              // Set product identifier as a user property
+              // Register product_name as a super property (included in all events including autocapture)
               posthogInstance.register({
                 product_name: PRODUCT_NAME,
               })
+              
+              // Also set as person property (affects Identify events)
+              posthogInstance.setPersonProperties({
+                product_name: PRODUCT_NAME,
+              })
+              
+              // Ensure properties persist by re-registering
+              // This ensures autocapture events get the property even if they fire before full initialization
+              if (posthogInstance.__loaded) {
+                posthogInstance.register({
+                  product_name: PRODUCT_NAME,
+                })
+              }
+              
               console.log('PostHog Debug: ✅ Initialized successfully!', {
                 product_name: PRODUCT_NAME,
                 isLoaded: posthogInstance.__loaded,
@@ -136,9 +150,28 @@ export function PostHogProviderComponent({ children }: { children: React.ReactNo
       }
     } else if (posthog.__loaded) {
       console.log('PostHog Debug: Already initialized')
+      // Ensure product_name is registered even if PostHog was initialized elsewhere
+      posthog.register({
+        product_name: PRODUCT_NAME,
+      })
+      posthog.setPersonProperties({
+        product_name: PRODUCT_NAME,
+      })
       setIsInitialized(true)
     }
   }, [])
+  
+  // Ensure product_name is registered whenever PostHog becomes available
+  useEffect(() => {
+    if (posthog.__loaded && !isInitialized) {
+      posthog.register({
+        product_name: PRODUCT_NAME,
+      })
+      posthog.setPersonProperties({
+        product_name: PRODUCT_NAME,
+      })
+    }
+  }, [isInitialized])
 
   // Always render children, PostHogProvider is optional
   return (
