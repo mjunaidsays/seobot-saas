@@ -49,49 +49,68 @@ export default function AppPage() {
   useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient()
-      
+
       // First, check if we have a session
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       console.log('App page session check:', { hasSession: !!session })
-      
+
       // Get user (this will refresh the session if needed)
-      const { data: { user }, error } = await supabase.auth.getUser()
-      
-      console.log('App page auth check:', { 
-        hasUser: !!user, 
-        userId: user?.id, 
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      console.log('App page auth check:', {
+        hasUser: !!user,
+        userId: user?.id,
         userEmail: user?.email,
         hasSession: !!session,
-        error: error?.message 
+        error: error?.message,
       })
-      
+
+      // Detect trial mode based on URL and/or localStorage
+      let trialFlag = false
+      if (typeof window !== 'undefined') {
+        try {
+          const url = new URL(window.location.href)
+          const trialParam = url.searchParams.get('trial')
+          const storedTrial = window.localStorage.getItem('seobot_trial_mode')
+          trialFlag = trialParam === '1' || storedTrial === 'true'
+        } catch {
+          trialFlag = false
+        }
+      }
+
       if (user) {
+        // Authenticated user path (right panel sign up / sign in)
         setUser(user)
         setIsAuthenticated(true)
-        
-        // Check if user is in trial mode
-        const trialMode = user.user_metadata?.trial_mode === true
-        setIsTrialMode(trialMode)
-        
+
+        // For real users, force non-trial mode
+        setIsTrialMode(false)
+
         // Identify user in PostHog
         identifyUser(user.id, {
           email: user.email,
           name: user.user_metadata?.full_name || user.email?.split('@')[0],
-          trial_mode: trialMode,
+          trial_mode: false,
         })
-        
+
         // Fetch user profile from users table
         const { data: profile, error: profileError } = await supabase
           .from('users')
           .select('*')
           .eq('id', user.id)
           .single()
-        
+
         if (profile) {
           setUserProfile(profile)
         } else if (profileError?.code === 'PGRST116') {
           // Profile doesn't exist, create it
-          const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
+          const fullName =
+            user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
           const { data: newProfile } = await supabase
             .from('users')
             .insert({
@@ -100,11 +119,16 @@ export default function AppPage() {
             })
             .select()
             .single()
-          
+
           if (newProfile) {
             setUserProfile(newProfile)
           }
         }
+      } else if (trialFlag && !session) {
+        // Trial mode without auth session (left panel Try Now)
+        setIsAuthenticated(true)
+        setIsTrialMode(true)
+        setUser(null)
       } else {
         setIsAuthenticated(false)
         router.push('/')

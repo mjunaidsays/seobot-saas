@@ -47,94 +47,50 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
       }
 
       const supabase = createClient()
-      
-      // Generate a random password (user won't need to remember it)
-      const tempPassword = `Temp${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}!A1`
-      
-      console.log('Trial Access: Attempting to sign up user with email:', trialEmail)
-      
-      // Sign up the user with email and password, mark as trial mode
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: trialEmail,
-        password: tempPassword,
-        options: {
-          data: {
+
+      console.log('Trial Access: Storing guest user with email:', trialEmail)
+
+      // Store guest user in guest_users table instead of creating an auth user
+      const { error: guestError } = await supabase
+        .from('guest_users')
+        .upsert(
+          {
+            email: trialEmail,
             full_name: trialName,
-            trial_mode: true, // Mark as trial user
+            source: 'try_now_modal',
           },
-        },
+          {
+            onConflict: 'email',
+          }
+        )
+
+      if (guestError) {
+        console.error('Guest user upsert error:', guestError)
+        setAuthError(guestError.message || 'Could not start trial. Please try again.')
+        setIsTrialLoading(false)
+        return
+      }
+
+      // Track trial access event (no auth user created)
+      trackEvent('trial_access_started', {
+        method: 'trial_access',
+        email: trialEmail,
       })
 
-      if (signUpError) {
-        console.error('Sign up error:', signUpError)
-        
-        // Handle specific error cases
-        if (signUpError.message.includes('already registered') || signUpError.message.includes('already exists')) {
-          // User already exists - automatically sign them in via server action
-          console.log('User already exists, attempting automatic sign-in...')
-          
-          try {
-            const response = await fetch('/api/auth/quick-access', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: trialEmail, name: trialName }),
-              credentials: 'include',
-            })
-            
-            const result = await response.json()
-            
-            if (result.success) {
-              console.log('✓ Existing user signed in successfully')
-              trackEvent('user_signed_in', {
-                method: 'trial_access',
-                email: trialEmail,
-              })
-              onClose()
-              router.push('/app')
-              router.refresh()
-              window.location.href = '/app'
-              return
-            } else {
-              console.error('Auto sign-in failed:', result.error)
-              setAuthError(result.error || 'Could not sign in. Please try again.')
-              setIsTrialLoading(false)
-              return
-            }
-          } catch (fetchError) {
-            console.error('Error calling quick-access API:', fetchError)
-            setAuthError('Network error. Please try again.')
-            setIsTrialLoading(false)
-            return
-          }
-        } else {
-          setAuthError(signUpError.message)
-          setIsTrialLoading(false)
-          return
+      // Mark this browser as trial mode for the app page
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('seobot_trial_mode', 'true')
+          window.localStorage.setItem('seobot_trial_email', trialEmail)
+          window.localStorage.setItem('seobot_trial_name', trialName)
+        } catch (storageError) {
+          console.warn('Unable to persist trial mode in localStorage:', storageError)
         }
       }
 
-      if (authData?.session) {
-        console.log('✓ Trial session created - redirecting to /app')
-        trackEvent('user_signed_up', {
-          method: 'trial_access',
-          email: trialEmail,
-          user_id: authData.user?.id,
-        })
-        if (authData.user?.id) {
-          identifyUser(authData.user.id, {
-            email: trialEmail,
-            name: trialName,
-          })
-        }
-        onClose()
-        window.location.href = '/app'
-      } else if (authData?.user && !authData.session) {
-        setAuthError('Email confirmation is required. Please check your email.')
-        setIsTrialLoading(false)
-      } else {
-        setAuthError('Sign up succeeded but session was not created. Please try again.')
-        setIsTrialLoading(false)
-      }
+      onClose()
+      // Navigate to app in trial mode (no auth session)
+      window.location.href = '/app?trial=1'
     } catch (error) {
       console.error('Trial access error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
