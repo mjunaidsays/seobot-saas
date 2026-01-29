@@ -61,7 +61,7 @@ export default function HeroSeobot() {
           className="mb-8"
         >
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-            <span className="gradient-text">SEObot</span> — fully autonomous{' '}
+            <span className="gradient-text">Up Rank</span> — fully autonomous{' '}
             <span className="gradient-text-accent">«SEO Robot»</span>
             <br />
             <span className="text-slate-100">with AI agents for{' '}</span>

@@ -24,7 +24,7 @@ export default function LanguagePills() {
     <Section className="overflow-hidden">
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Supported Languages</p>
-        <h3 className="section-heading">SEO bot supports 50+ languages</h3>
+        <h3 className="section-heading">Up Rank supports 50+ languages</h3>
       </div>
 
       <div className="relative space-y-4">
