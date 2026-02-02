@@ -4,7 +4,9 @@ import Section from './ui/Section'
 import ButtonSeobot from './ui/ButtonSeobot'
 import Link from 'next/link'
 import { FaCheck, FaRocket, FaCrown, FaBuilding } from 'react-icons/fa'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 const pricingPlans = [
   {
@@ -64,8 +66,9 @@ const pricingPlans = [
 
 export default function PricingSection() {
   return (
-    <Section id="pricing">
-      <div className="text-center mb-16">
+    <LazyMotion features={loadFeatures} strict>
+      <Section id="pricing">
+        <div className="text-center mb-16">
         <p className="section-title">{'//'} Pricing</p>
         <h3 className="section-heading">Choose the plan that fits your needs</h3>
         <p className="text-slate-400 text-lg mt-4">
@@ -80,7 +83,7 @@ export default function PricingSection() {
             const isPopular = plan.popular
             
             return (
-              <motion.div
+              <m.div
                 key={plan.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -163,13 +166,13 @@ export default function PricingSection() {
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             )
           })}
         </div>
 
         {/* Additional Info */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -182,8 +185,9 @@ export default function PricingSection() {
           <p className="text-slate-500 text-xs mt-2">
             Need a custom plan? <Link href="#" className="text-emerald-400 hover:underline">Contact us</Link>
           </p>
-        </motion.div>
-      </div>
-    </Section>
+        </m.div>
+        </div>
+      </Section>
+    </LazyMotion>
   )
 }

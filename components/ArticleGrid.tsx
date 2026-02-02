@@ -2,7 +2,9 @@
 
 import Section from './ui/Section'
 import CardSeobot from './ui/CardSeobot'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 import Link from 'next/link'
 import { FaArrowRight } from 'react-icons/fa'
 import articlesData from '@/data/articles.json'
@@ -19,6 +21,7 @@ const categoryColors: { [key: string]: string } = {
 
 export default function ArticleGrid() {
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section>
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Articles examples</p>
@@ -26,7 +29,7 @@ export default function ArticleGrid() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
         {articlesData.map((article, index) => (
-          <motion.div
+          <m.div
             key={article.id}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -56,9 +59,10 @@ export default function ArticleGrid() {
                 <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </CardSeobot>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </Section>
+    </LazyMotion>
   )
 }

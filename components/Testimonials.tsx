@@ -1,14 +1,17 @@
 'use client'
 
 import Section from './ui/Section'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
 import testimonialsData from '@/data/testimonials.json'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 export default function Testimonials() {
   // Duplicate testimonials for infinite scroll effect
   const duplicatedTestimonials = [...testimonialsData, ...testimonialsData, ...testimonialsData]
 
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section className="overflow-hidden">
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Customer success stories</p>
@@ -20,7 +23,7 @@ export default function Testimonials() {
 
       <div className="relative">
         {/* First Row - Scroll Left */}
-        <motion.div
+        <m.div
           animate={{
             x: [0, -1000],
           }}
@@ -60,10 +63,10 @@ export default function Testimonials() {
               <p className="text-gray-500 text-xs">{testimonial.date}</p>
             </div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Second Row - Scroll Right */}
-        <motion.div
+        <m.div
           animate={{
             x: [-1000, 0],
           }}
@@ -103,8 +106,9 @@ export default function Testimonials() {
               <p className="text-gray-500 text-xs">{testimonial.date}</p>
             </div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
     </Section>
+    </LazyMotion>
   )
 }

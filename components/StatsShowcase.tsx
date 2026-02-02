@@ -1,7 +1,9 @@
 'use client'
 
 import Section from './ui/Section'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 const statsData = [
   {
@@ -28,6 +30,7 @@ const statsData = [
 
 export default function StatsShowcase() {
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section>
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Transform your content strategy</p>
@@ -39,7 +42,7 @@ export default function StatsShowcase() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
         {statsData.map((stat, index) => (
-          <motion.div
+          <m.div
             key={stat.site}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -99,9 +102,10 @@ export default function StatsShowcase() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </Section>
+    </LazyMotion>
   )
 }
