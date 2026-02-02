@@ -1,7 +1,9 @@
 'use client'
 
 import Section from './ui/Section'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 const languages = [
   'Arabic', 'Basque', 'Bengali', 'Bulgarian', 'Catalan', 'Chinese',
@@ -21,6 +23,7 @@ export default function LanguagePills() {
   const row3 = duplicatedLanguages.slice(48, 72)
 
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section className="overflow-hidden">
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Supported Languages</p>
@@ -29,7 +32,7 @@ export default function LanguagePills() {
 
       <div className="relative space-y-4">
         {/* Row 1 - Scroll Left */}
-        <motion.div
+        <m.div
           animate={{
             x: [0, -1200],
           }}
@@ -48,10 +51,10 @@ export default function LanguagePills() {
               {language}
             </div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Row 2 - Scroll Right */}
-        <motion.div
+        <m.div
           animate={{
             x: [-1200, 0],
           }}
@@ -70,10 +73,10 @@ export default function LanguagePills() {
               {language}
             </div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Row 3 - Scroll Left */}
-        <motion.div
+        <m.div
           animate={{
             x: [0, -1200],
           }}
@@ -92,10 +95,10 @@ export default function LanguagePills() {
               {language}
             </div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Row 4 - Scroll Right */}
-        <motion.div
+        <m.div
           animate={{
             x: [-1200, 0],
           }}
@@ -106,8 +109,9 @@ export default function LanguagePills() {
           }}
           className="flex space-x-3"
         >
-        </motion.div>
+        </m.div>
       </div>
     </Section>
+    </LazyMotion>
   )
 }

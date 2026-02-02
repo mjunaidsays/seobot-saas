@@ -1,7 +1,9 @@
 'use client'
 
 import Section from './ui/Section'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 import { SiWebflow, SiWordpress, SiNotion, SiShopify, SiFramer, SiNextdotjs } from 'react-icons/si'
 import { FaGhost, FaCode } from 'react-icons/fa'
 
@@ -22,6 +24,7 @@ const integrations = [
 
 export default function IntegrationsGrid() {
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section>
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Auto sync with popular CMS</p>
@@ -30,7 +33,7 @@ export default function IntegrationsGrid() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
         {integrations.map((integration, index) => (
-          <motion.div
+          <m.div
             key={integration.name}
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -57,9 +60,10 @@ export default function IntegrationsGrid() {
                 {integration.name}
               </p>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </Section>
+    </LazyMotion>
   )
 }

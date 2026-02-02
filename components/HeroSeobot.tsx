@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { LazyMotion, m, AnimatePresence } from 'framer-motion'
 import ButtonSeobot from './ui/ButtonSeobot'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaLinkedin, FaTwitter, FaEnvelope } from 'react-icons/fa'
 import SeobotAuthModal from './AuthForms/SeobotAuthModal'
+
+// Lazy-load animation features for better performance
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 const audiences = [
   'solo makers',
@@ -35,7 +38,8 @@ export default function HeroSeobot() {
   }, [])
 
   return (
-    <section className="min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-16 px-4 md:px-8 relative">
+    <LazyMotion features={loadFeatures} strict>
+      <section className="min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-16 px-4 md:px-8 relative">
       {/* Subtle background gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
@@ -44,17 +48,17 @@ export default function HeroSeobot() {
       
       <div className="max-w-6xl mx-auto text-center relative z-10">
         {/* Subtitle */}
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-emerald-400 text-sm md:text-base font-mono font-bold mb-8 tracking-tight"
         >
           {'//'} Next-generation SEO automation
-        </motion.p>
+        </m.p>
 
         {/* Main Heading with Typing Animation */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -67,7 +71,7 @@ export default function HeroSeobot() {
             <span className="text-slate-100">with AI agents for{' '}</span>
             <span className="relative inline-block">
               <AnimatePresence mode="wait">
-                <motion.span
+                <m.span
                   key={currentIndex}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -76,21 +80,21 @@ export default function HeroSeobot() {
                   className="text-emerald-400 inline-block font-semibold"
                 >
                   {audiences[currentIndex]}
-                </motion.span>
+                </m.span>
               </AnimatePresence>
-              <motion.span
+              <m.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
                 className="inline-block ml-1 text-emerald-400"
               >
                 |
-              </motion.span>
+              </m.span>
             </span>
           </h1>
-        </motion.div>
+        </m.div>
 
         {/* Description */}
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -99,10 +103,10 @@ export default function HeroSeobot() {
           Automate your entire SEO workflow with intelligent content generation,
           <br />
           keyword optimization, and performance tracking—all in one platform.
-        </motion.p>
+        </m.p>
 
         {/* CTA Buttons */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
@@ -116,17 +120,17 @@ export default function HeroSeobot() {
           >
             Start automating SEO
           </ButtonSeobot>
-        </motion.div>
+        </m.div>
 
         {/* Pricing Note */}
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-slate-400 text-sm mb-16 font-mono"
         >
           * Plans starting from $49/month
-        </motion.p>
+        </m.p>
 
         {/* Founder Card */}
         {/* <motion.div
@@ -177,5 +181,6 @@ export default function HeroSeobot() {
         onClose={() => setIsAuthModalOpen(false)}
       />
     </section>
+    </LazyMotion>
   )
 }

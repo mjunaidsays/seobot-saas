@@ -2,10 +2,13 @@
 
 import Section from './ui/Section'
 import CardSeobot from './ui/CardSeobot'
-import { motion } from 'framer-motion'
+import { LazyMotion, m } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 export default function WhyChoose() {
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section>
       <div className="text-center mb-16">
         <p className="section-title">{'//'} Why choose our platform?</p>
@@ -15,7 +18,7 @@ export default function WhyChoose() {
         </p>
       </div>
 
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -43,7 +46,8 @@ export default function WhyChoose() {
             </div>
           </div>
         </CardSeobot>
-      </motion.div>
+      </m.div>
     </Section>
+    </LazyMotion>
   )
 }

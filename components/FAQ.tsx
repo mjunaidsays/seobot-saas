@@ -3,8 +3,10 @@
 import Section from './ui/Section'
 import { useState } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
-import { motion, AnimatePresence } from 'framer-motion'
+import { LazyMotion, m, AnimatePresence } from 'framer-motion'
 import faqData from '@/data/faq.json'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 export default function FAQ() {
   const [openId, setOpenId] = useState<number | null>(null)
@@ -14,6 +16,7 @@ export default function FAQ() {
   }
 
   return (
+    <LazyMotion features={loadFeatures} strict>
     <Section>
       <div className="text-center mb-16">
         <p className="section-title">{'//'} FAQ</p>
@@ -26,7 +29,7 @@ export default function FAQ() {
 
       <div className="max-w-4xl mx-auto space-y-4">
         {faqData.map((faq, index) => (
-          <motion.div
+          <m.div
             key={faq.id}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -50,7 +53,7 @@ export default function FAQ() {
 
             <AnimatePresence>
               {openId === faq.id && (
-                <motion.div
+                <m.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -60,12 +63,13 @@ export default function FAQ() {
                   <div className="px-6 pb-5 text-gray-400 leading-relaxed">
                     {faq.answer}
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </Section>
+    </LazyMotion>
   )
 }

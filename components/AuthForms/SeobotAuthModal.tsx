@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { LazyMotion, m, AnimatePresence } from 'framer-motion'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 import { FaTimes, FaEye, FaEyeSlash } from 'react-icons/fa'
 import ButtonSeobot from '../ui/ButtonSeobot'
 import { useRouter } from 'next/navigation'
@@ -211,11 +213,12 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
   if (!isOpen) return null
 
   return (
+    <LazyMotion features={loadFeatures} strict>
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -224,7 +227,7 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
           />
 
           {/* Modal */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -262,15 +265,15 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
                         onClick={() => setShowTrialForm(true)}
                         className="w-full sm:w-auto min-h-[48px] px-8 py-4 text-base sm:text-lg"
                       >
-                        Try Now
-                      </ButtonSeobot>
-                    </div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="space-y-4"
-                    >
+                      Try Now
+                    </ButtonSeobot>
+                  </div>
+                ) : (
+                  <m.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-4"
+                  >
                       <button
                         onClick={() => {
                           setShowTrialForm(false)
@@ -328,11 +331,11 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
                           className="w-full min-h-[48px]"
                           disabled={isTrialLoading}
                         >
-                          {isTrialLoading ? 'Loading...' : 'Continue'}
-                        </ButtonSeobot>
-                      </form>
-                    </motion.div>
-                  )}
+                        {isTrialLoading ? 'Loading...' : 'Continue'}
+                      </ButtonSeobot>
+                    </form>
+                  </m.div>
+                )}
                 </div>
 
                 {/* Right Panel - Sign Up / Sign In */}
@@ -367,7 +370,7 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
                     </button>
                   </div>
 
-                  <motion.div
+                  <m.div
                     key={authMode}
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -484,13 +487,14 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
                           : 'Sign In'}
                       </ButtonSeobot>
                     </form>
-                  </motion.div>
+                  </m.div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>
+    </LazyMotion>
   )
 }

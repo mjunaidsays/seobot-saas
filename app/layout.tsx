@@ -10,16 +10,22 @@ import { ThemeProvider } from '@/components/theme-provider';
 import dynamic from 'next/dynamic';
 import { Analytics } from '@vercel/analytics/react';
 import {PostHogProviderComponent} from '@/components/PostHogProvider';
+import DelayedMatrixRain from '@/components/DelayedMatrixRain';
 
 const fontSans = FontSans({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-sans'
+  weight: ['400', '600', '700'], // Reduced from 6 weights to 3 for better performance
+  variable: '--font-sans',
+  display: 'swap', // Improves visual stability during font loading
+  preload: true
 });
 
 const fontMono = FontMono({
   subsets: ['latin'],
-  variable: '--font-mono'
+  weight: ['400', '600'], // Only include weights we actually use
+  variable: '--font-mono',
+  display: 'swap',
+  preload: false // Only preload if used above-the-fold
 });
 
 const meta = {
@@ -64,7 +70,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   const CrispWithNoSSR = dynamic(() => import('../components/crisp'));
-  const MatrixRain = dynamic(() => import('../components/MatrixRain'), { ssr: false });
   return (
     <html lang="en" className="scroll-smooth scroll-p-16">
       <body
@@ -75,7 +80,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         )}
       >
         <CrispWithNoSSR />
-        <MatrixRain />
+        <DelayedMatrixRain />
         <PostHogProviderComponent>
           <ThemeProvider
             attribute="class"
