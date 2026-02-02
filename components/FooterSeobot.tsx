@@ -58,12 +58,12 @@ export default function FooterSeobot() {
             <h3 className="text-white font-semibold mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
+                <Link href="/privacy" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
+                <Link href="/terms" className="text-slate-400 hover:text-emerald-400 transition-all duration-300 text-sm hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]">
                   Terms of Service
                 </Link>
               </li>

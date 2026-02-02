@@ -22,18 +22,30 @@ export default function NavbarSeobot() {
 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link
+              {/* <Link
                 href="https://seobot.tolt.io/"
                 target="_blank"
                 className="text-slate-300 hover:text-white transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]"
               >
                 Refer to earn
-              </Link>
+              </Link> */}
               <Link
                 href="#pricing"
                 className="text-slate-300 hover:text-white transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]"
               >
                 Pricing
+              </Link>
+              <Link
+                href="/privacy"
+                className="text-slate-300 hover:text-white transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href="/terms"
+                className="text-slate-300 hover:text-white transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]"
+              >
+                Terms of Service
               </Link>
             </div>
 
