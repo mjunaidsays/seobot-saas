@@ -1,6 +1,246 @@
 import OpenAI from 'openai'
 import * as cheerio from 'cheerio'
 import { ResearchData, PlanItem } from '@/lib/types/api'
+import { z } from 'zod'
+
+// ============================================================================
+// VALIDATION SCHEMAS (JSON Schema Validation)
+// ============================================================================
+
+const SiteMapItemSchema = z.object({
+  url: z.string().url(),
+  title: z.string().min(1),
+})
+
+const ResearchDataSchema = z.object({
+  audience: z.string().min(20),
+  niche: z.string().min(10),
+  core_keywords: z.array(z.string().min(1)).min(5).max(12),
+  tone: z.string().min(5),
+  site_map: z.array(SiteMapItemSchema).min(1),
+})
+
+const PlanItemSchema = z.object({
+  title: z.string().min(10),
+  main_keyword: z.string().min(2),
+  lsi_keywords: z.array(z.string().min(1)).min(3).max(8),
+  word_count: z.number().min(1000).max(5000),
+})
+
+const ContentPlanResponseSchema = z.object({
+  plan: z.array(PlanItemSchema).min(1).max(10),
+})
+
+const ChatResponseSchema = z.object({
+  answer: z.string().min(1),
+  plan: z.array(PlanItemSchema),
+})
+
+// ============================================================================
+// ENHANCED SEO EXPERT SYSTEM PROMPTS
+// ============================================================================
+
+// const SEO_EXPERT_SYSTEM_PROMPT = `You are an elite SEO strategist and content expert with 10+ years of experience in search engine optimization and digital marketing. You have deep expertise in:
+
+// **CORE SEO COMPETENCIES:**
+// - Creating content that consistently ranks in top 3 positions for competitive keywords
+// - Mastering Google's E-E-A-T principles: Experience, Expertise, Authoritativeness, Trustworthiness
+// - Understanding and satisfying all types of search intent: informational, navigational, commercial, transactional
+// - Using natural language processing (NLP) and semantic SEO techniques
+// - Applying cutting-edge SEO best practices (2026 standards including AI-generated content detection avoidance)
+// - Optimizing for Core Web Vitals and user experience signals
+// - Creating content that passes Google's Helpful Content Update criteria
+
+// **TECHNICAL SEO KNOWLEDGE:**
+// - Strategic keyword placement: title tags, meta descriptions, H1-H6 hierarchy, first 100 words, conclusion
+// - Optimal keyword density: 1-2% for primary keywords, natural semantic variations throughout
+// - LSI (Latent Semantic Indexing) keywords and related entity optimization
+// - Topic clustering and content siloing strategies
+// - Schema markup recommendations and structured data optimization
+
+// **SERP FEATURE OPTIMIZATION:**
+// - Featured snippets: Creating concise, definitive answers in 40-60 words
+// - People Also Ask (PAA): Addressing related questions comprehensively
+// - Rich results: Tables, lists, and structured content for enhanced visibility
+// - Video snippets: Strategic YouTube embed placement and video SEO
+// - Image optimization: Alt text, captions, and contextual relevance
+
+// **CONTENT QUALITY STANDARDS:**
+// - Comprehensive topic coverage (surpassing top 10 competitors in depth and breadth)
+// - Original insights, data, examples, and expert perspectives (no generic fluff)
+// - Actionable takeaways and step-by-step guidance
+// - Engaging writing that keeps users on page (reducing bounce rate, increasing dwell time)
+// - Natural internal linking to strengthen site architecture
+// - Authority-building through cited sources and data-backed claims
+
+// **COMPETITIVE ADVANTAGES:**
+// - Analyzing and outperforming competitor content in quality, depth, and value
+// - Creating "10x content" that is significantly better than existing top-ranking pages
+// - Implementing content differentiation strategies (unique angles, updated data, better visuals)
+// - Anticipating future search trends and user needs
+
+// **ETHICAL STANDARDS:**
+// - Zero tolerance for keyword stuffing, cloaking, or black-hat tactics
+// - Creating genuinely helpful content that serves user needs first
+// - Building sustainable rankings through quality and value, not manipulation
+// - Transparent, honest information that builds trust and authority
+
+// Your mission: Produce data-driven, user-focused content that dominates search results while providing exceptional value to readers.`
+
+// const CONTENT_WRITER_SYSTEM_PROMPT = `You are a world-class SEO content writer and senior strategist who creates authoritative, high-ranking blog articles that outperform competitors. Your expertise includes:
+
+// **WRITING MASTERY:**
+// - Crafting comprehensive, well-researched long-form content (1500-4000 words) that ranks #1
+// - Creating compelling, click-worthy headlines with power words and primary keywords at the beginning
+// - Writing magnetic introductions using the AIDA formula (Attention, Interest, Desire, Action)
+// - Using the inverted pyramid structure: most important information first
+// - Maintaining reader engagement through storytelling, examples, and practical insights
+// - Writing with clarity: 75%+ of sentences under 20 words, 8th-grade reading level
+// - Using active voice (90%+ of sentences) for directness and authority
+
+// **SEO OPTIMIZATION:**
+// - Strategic keyword placement: H1, first 100 words, H2/H3 headers, conclusion, meta description
+// - Natural keyword integration: 1-2% density for primary, semantic variations throughout
+// - LSI keywords and related entities woven naturally into content
+// - Optimizing for featured snippets: concise answers (40-60 words), bulleted lists, tables
+// - People Also Ask optimization: Question-answer format matching search queries
+// - Internal linking strategy: 2-4 contextual links with descriptive anchor text
+// - Creating link-worthy content that earns natural backlinks
+
+// **CONTENT STRUCTURE:**
+// - Clear H1-H6 hierarchy optimized for both users and search crawlers
+// - Scannable format: short paragraphs (2-4 sentences), subheadings every 300 words
+// - Visual variety: bullet points, numbered lists, tables, blockquotes, bold text for emphasis
+// - Strategic white space for improved readability and reduced cognitive load
+// - FAQ sections targeting "People Also Ask" and voice search queries
+// - Strong conclusions with clear takeaways and compelling CTAs
+
+// **E-E-A-T PRINCIPLES:**
+// - Experience: First-hand insights, real-world examples, case studies, personal anecdotes
+// - Expertise: Deep technical knowledge, industry terminology used appropriately, expert-level insights
+// - Authoritativeness: Citing credible sources, referencing data/statistics, demonstrating thought leadership
+// - Trustworthiness: Accuracy, transparency, balanced perspectives, honest recommendations
+
+// **COMPETITIVE EDGE:**
+// - Creating "10x content": 10 times better than anything else ranking for the target keyword
+// - Comprehensive topic coverage: answering every possible user question
+// - Unique value propositions: original research, exclusive insights, better examples
+// - Updated information: current data, latest trends, 2026 best practices
+// - Problem-solving focus: addressing pain points, providing solutions, actionable steps
+
+// **FORMATTING BEST PRACTICES:**
+// - Use **bold** for key terms, important points, and emphasis (not overused)
+// - Use *italics* for subtle emphasis, quotes, and definitions
+// - Use code blocks for technical terms, file names, or commands
+// - Use > blockquotes for important insights, statistics, or expert quotes
+// - Use tables for comparisons, data, specifications, or step-by-step processes
+// - Use bullet/numbered lists for steps, features, benefits, or key points
+// - NO emojis, NO promotional fluff, NO clickbait, NO keyword stuffing
+
+// **SEARCH INTENT SATISFACTION:**
+// - Informational: Comprehensive answers, multiple angles, related topics covered
+// - Navigational: Clear structure, easy scanning, direct answers
+// - Commercial: Comparisons, pros/cons, recommendations, buying guides
+// - Transactional: Clear CTAs, next steps, actionable guidance
+
+// Your articles dominate search results, earn featured snippets, and provide exceptional value that keeps readers engaged and coming back.`
+
+const SEO_EXPERT_SYSTEM_PROMPT = `You are an elite SEO strategist and content expert with 10+ years of experience in search engine optimization and digital marketing.
+
+**CORE EXPERTISE:**
+- Creating content that ranks in top 3 positions for competitive keywords
+- Mastering Google's E-E-A-T principles (Experience, Expertise, Authoritativeness, Trustworthiness)
+- Understanding search intent: informational, navigational, commercial, transactional
+- Applying 2026 SEO best practices including AI-content detection avoidance
+- Topic clustering, semantic SEO, and LSI keyword optimization
+
+**TECHNICAL KNOWLEDGE:**
+- Strategic keyword placement: title tags, H1-H6, first 100 words, conclusion
+- Optimal keyword density: 1-2% primary, natural semantic variations
+- Schema markup and structured data recommendations
+- Featured snippet optimization: 40-60 word concise answers
+- People Also Ask (PAA) targeting and rich result optimization
+
+**CONTENT STANDARDS:**
+- Comprehensive topic coverage surpassing top 10 competitors
+- Original insights with data-backed claims and expert perspectives
+- Actionable guidance that reduces bounce rate and increases dwell time
+- Creating "10x content" significantly better than existing top-ranking pages
+- Zero keyword stuffing or black-hat tactics - quality and value first
+
+Your mission: Produce data-driven, user-focused content that dominates search results while providing exceptional value.`
+
+const CONTENT_WRITER_SYSTEM_PROMPT = `You are a world-class SEO content writer creating authoritative, high-ranking blog articles that outperform competitors.
+
+**WRITING EXCELLENCE:**
+- Comprehensive long-form content (1500-4000 words) optimized for #1 rankings
+- Compelling headlines with power words and primary keywords at the beginning
+- Magnetic introductions using AIDA formula (Attention, Interest, Desire, Action)
+- Maintaining engagement through storytelling, examples, and practical insights
+- Clarity: 75%+ sentences under 20 words, 8th-grade reading level, 90%+ active voice
+
+**SEO OPTIMIZATION:**
+- Strategic keyword placement: H1, first 100 words, H2/H3 headers, conclusion, meta
+- Natural integration: 1-2% density for primary, semantic variations throughout
+- Featured snippet optimization: concise answers, bulleted lists, tables
+- People Also Ask: Question-answer format matching search queries
+- Internal linking: 2-4 contextual links with descriptive anchor text
+
+**CONTENT STRUCTURE:**
+- Clear H1-H6 hierarchy for users and search crawlers
+- Scannable format: short paragraphs (2-4 sentences), subheadings every 300 words
+- Strategic use of: bullet points, numbered lists, tables, blockquotes, bold emphasis
+- FAQ sections targeting PAA and voice search queries
+- Strong conclusions with clear takeaways and compelling CTAs
+
+**E-E-A-T PRINCIPLES:**
+- Experience: First-hand insights, real-world examples, case studies
+- Expertise: Deep technical knowledge, industry terminology, expert-level insights
+- Authoritativeness: Credible sources, data/statistics, thought leadership
+- Trustworthiness: Accuracy, transparency, balanced perspectives
+
+**COMPETITIVE EDGE:**
+- "10x content": 10 times better than top-ranking competitors
+- Comprehensive coverage answering every possible user question
+- Unique value: original research, exclusive insights, updated 2026 data
+- Problem-solving focus with actionable steps
+
+**FORMATTING RULES:**
+- **Bold** for key terms and emphasis (not overused)
+- *Italics* for subtle emphasis and definitions
+- Tables for comparisons, data, or step-by-step processes
+- > Blockquotes for important insights or statistics
+- Lists only where they improve clarity
+- NO emojis, NO promotional fluff, NO clickbait, NO keyword stuffing
+
+Your articles dominate search results, earn featured snippets, and provide exceptional value.`
+
+// ============================================================================
+// LLM PARAMETERS (Temperature & Parameter Tuning)
+// ============================================================================
+
+const LLM_PARAMS = {
+  RESEARCH: {
+    temperature: 0.7,
+    top_p: 0.9,
+    reasoning_effort: 'low' as const,
+  },
+  PLANNING: {
+    temperature: 0.6,
+    top_p: 0.85,
+    reasoning_effort: 'low' as const,
+  },
+  CONTENT: {
+    temperature: 0.6,
+    top_p: 0.85,
+    reasoning_effort: 'low' as const,
+  },
+  CHAT: {
+    temperature: 0.5,
+    top_p: 0.9,
+    reasoning_effort: 'low' as const,
+  },
+}
 
 // Lazy initialization to avoid build-time errors
 let client: OpenAI | null = null
@@ -12,7 +252,7 @@ const getClient = (): OpenAI => {
   
   if (!client) {
     client = new OpenAI({
-      apiKey: process.env.NEXT_PUBLIC_OPENROUTER_API_KEY,
+      apiKey: process.env.NEXT_PUBLIC_OPENROUTER_API_KEY, 
       baseURL: 'https://openrouter.ai/api/v1',
       defaultHeaders: {
         'HTTP-Referer': 'https://seobot-saas.com', // Optional, for OpenRouter rankings
@@ -164,12 +404,27 @@ export async function researchSite(url: string): Promise<ResearchData> {
 
     const completion = await getClient().chat.completions.create({
       model: 'gpt-5-nano',
-      messages: [{ role: 'user', content: prompt }],
+      messages: [
+        { role: 'system', content: SEO_EXPERT_SYSTEM_PROMPT },
+        { role: 'user', content: prompt }
+      ],
       response_format: { type: 'json_object' },
+      temperature: LLM_PARAMS.RESEARCH.temperature,
+      top_p: LLM_PARAMS.RESEARCH.top_p,
+      reasoning_effort: LLM_PARAMS.RESEARCH.reasoning_effort,
     })
 
-    const result = JSON.parse(completion.choices[0].message.content || '{}')
-    return result as ResearchData
+    const rawResult = JSON.parse(completion.choices[0].message.content || '{}')
+    
+    try {
+      const validatedResult = ResearchDataSchema.parse(rawResult)
+      console.log('✓ Research data validated successfully')
+      return validatedResult as ResearchData
+    } catch (validationError) {
+      console.error('❌ Research data validation failed:', validationError)
+      console.warn('⚠️ Returning unvalidated research data as fallback')
+      return rawResult as ResearchData
+    }
   } catch (error) {
     console.error('Research error:', error)
     throw new Error(`Failed to research site: ${error}`)
@@ -204,12 +459,27 @@ export async function generateContentPlan(
 
   const completion = await getClient().chat.completions.create({
     model: 'gpt-5-nano',
-    messages: [{ role: 'user', content: prompt }],
+    messages: [
+      { role: 'system', content: SEO_EXPERT_SYSTEM_PROMPT },
+      { role: 'user', content: prompt }
+    ],
     response_format: { type: 'json_object' },
+    temperature: LLM_PARAMS.PLANNING.temperature,
+    top_p: LLM_PARAMS.PLANNING.top_p,
+    reasoning_effort: LLM_PARAMS.PLANNING.reasoning_effort,
   })
 
-  const result = JSON.parse(completion.choices[0].message.content || '{}')
-  return result.plan || []
+  const rawResult = JSON.parse(completion.choices[0].message.content || '{}')
+  
+  try {
+    const validatedResult = ContentPlanResponseSchema.parse(rawResult)
+    console.log('✓ Content plan validated successfully:', validatedResult.plan.length, 'items')
+    return validatedResult.plan || []
+  } catch (validationError) {
+    console.error('❌ Content plan validation failed:', validationError)
+    console.warn('⚠️ Returning unvalidated content plan as fallback')
+    return rawResult.plan || []
+  }
 }
 
 /**
@@ -271,14 +541,32 @@ export async function updateContentPlan(
 
   const completion = await getClient().chat.completions.create({
     model: 'gpt-5-nano',
-    messages: [{ role: 'user', content: prompt }],
+    messages: [
+      { role: 'system', content: SEO_EXPERT_SYSTEM_PROMPT },
+      { role: 'user', content: prompt }
+    ],
     response_format: { type: 'json_object' },
+    temperature: LLM_PARAMS.CHAT.temperature,
+    top_p: LLM_PARAMS.CHAT.top_p,
+    reasoning_effort: LLM_PARAMS.CHAT.reasoning_effort,
   })
 
-  const result = JSON.parse(completion.choices[0].message.content || '{}')
-  return {
-    answer: result.answer || '',
-    plan: result.plan || [],
+  const rawResult = JSON.parse(completion.choices[0].message.content || '{}')
+  
+  try {
+    const validatedResult = ChatResponseSchema.parse(rawResult)
+    console.log('✓ Chat response validated successfully')
+    return {
+      answer: validatedResult.answer || '',
+      plan: validatedResult.plan || [],
+    }
+  } catch (validationError) {
+    console.error('❌ Chat response validation failed:', validationError)
+    console.warn('⚠️ Returning unvalidated chat response as fallback')
+    return {
+      answer: rawResult.answer || '',
+      plan: rawResult.plan || [],
+    }
   }
 }
 
@@ -353,22 +641,68 @@ export async function generateArticle(
     `
 
   try {
-    const completion = await getClient().chat.completions.create({
-      model: 'gpt-5-nano',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a professional SEO writer specializing in high-authority guides.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      max_completion_tokens: 4000,
-      reasoning_effort: 'low',
-    })
+    // Calculate appropriate token limit based on word count
+    const estimatedTokens = Math.ceil(wordCount * 1.4) // 1.4x for markdown formatting
+    const maxTokens = Math.min(estimatedTokens + 1000, 16000) // +1000 buffer
+    
+    console.log(`  Requesting ${maxTokens} tokens for ${wordCount} word article`)
+    
+    let completion
+    try {
+      completion = await getClient().chat.completions.create({
+        model: 'gpt-5-nano',
+        messages: [
+          { role: 'system', content: CONTENT_WRITER_SYSTEM_PROMPT },
+          { role: 'user', content: prompt },
+        ],
+        max_completion_tokens: maxTokens,
+        temperature: LLM_PARAMS.CONTENT.temperature,
+        top_p: LLM_PARAMS.CONTENT.top_p,
+        reasoning_effort: LLM_PARAMS.CONTENT.reasoning_effort,
+      })
+    } catch (reasoningError) {
+      console.warn('  Retrying without reasoning_effort parameter')
+      completion = await getClient().chat.completions.create({
+        model: 'gpt-5-nano',
+        messages: [
+          { role: 'system', content: CONTENT_WRITER_SYSTEM_PROMPT },
+          { role: 'user', content: prompt },
+        ],
+        max_completion_tokens: maxTokens,
+        temperature: LLM_PARAMS.CONTENT.temperature,
+        top_p: LLM_PARAMS.CONTENT.top_p,
+      })
+    }
 
+    if (!completion.choices || completion.choices.length === 0) {
+      console.error('⚠️ CRITICAL: No choices in API response!')
+      throw new Error('API returned no completion choices')
+    }
+    
     const finalArticle = completion.choices[0].message.content?.trim() || ''
-    console.log(`Successfully generated article for: ${topic}`)
+    
+    console.log(`  API Response - Finish Reason: ${completion.choices[0].finish_reason}`)
+    console.log(`  Tokens Used: ${completion.usage?.completion_tokens || 'unknown'} / ${maxTokens}`)
+    console.log(`  Article Length: ${finalArticle.length} characters, ~${finalArticle.split(/\s+/).length} words`)
+    
+    if (completion.choices[0].finish_reason === 'length') {
+      console.error('⚠️ WARNING: Response was truncated due to token limit!')
+    }
+    
+    if (!finalArticle || finalArticle.length < 100) {
+      console.error('⚠️ CRITICAL: Article is empty or too short!')
+      throw new Error('Generated article is empty or too short. The LLM may have failed to generate content.')
+    }
+    
+    const actualWordCount = finalArticle.split(/\s+/).length
+    if (actualWordCount < 500) {
+      console.error('⚠️ CRITICAL: Article word count too low!')
+      console.error(`  Expected: ${wordCount} words, Got: ${actualWordCount} words`)
+      throw new Error(`Article generation failed: only ${actualWordCount} words generated instead of ${wordCount}`)
+    }
+    
+    console.log(`✓ Article generated successfully for: ${topic}`)
+    
     return finalArticle
   } catch (error) {
     console.error(`Error generating article for ${topic}:`, error)

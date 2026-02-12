@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaTimes, FaTrash, FaHistory, FaPlus } from 'react-icons/fa'
+import { FaTimes, FaTrash, FaHistory, FaPlus, FaHome, FaChevronDown, FaChevronRight, FaFileAlt } from 'react-icons/fa'
 import { listConversations, deleteConversation, ConversationProject } from '@/utils/database/conversations'
+import { ArticleData } from '@/utils/database/articles'
 import { createClient } from '@/utils/supabase/client'
+import Link from 'next/link'
 
 interface ConversationHistoryProps {
   isOpen: boolean
   onClose: () => void
   onSelectConversation: (project: ConversationProject) => void
   onNewConversation: () => void
+  onSelectArticle: (article: ArticleData) => void
   currentProjectId?: string | null
 }
 
@@ -19,11 +22,14 @@ export default function ConversationHistory({
   onClose,
   onSelectConversation,
   onNewConversation,
+  onSelectArticle,
   currentProjectId,
 }: ConversationHistoryProps) {
   const [conversations, setConversations] = useState<ConversationProject[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [projectArticles, setProjectArticles] = useState<Record<string, ArticleData[]>>({})
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (isOpen) {
@@ -41,6 +47,32 @@ export default function ConversationHistory({
         setUserId(user.id)
         const convos = await listConversations(user.id)
         setConversations(convos)
+        
+        // Load articles for each conversation using client-side Supabase
+        const articlesMap: Record<string, ArticleData[]> = {}
+        await Promise.all(
+          convos.map(async (convo) => {
+            try {
+              // Fetch articles directly using client Supabase
+              const { data: articles, error } = await supabase
+                .from('articles')
+                .select('*')
+                .eq('project_id', convo.id)
+                .order('created_at', { ascending: false })
+
+              if (error) {
+                console.error(`Error loading articles for project ${convo.id}:`, error)
+                articlesMap[convo.id] = []
+              } else {
+                articlesMap[convo.id] = (articles || []) as ArticleData[]
+              }
+            } catch (error) {
+              console.error(`Error loading articles for project ${convo.id}:`, error)
+              articlesMap[convo.id] = []
+            }
+          })
+        )
+        setProjectArticles(articlesMap)
       }
     } catch (error) {
       console.error('Error loading conversations:', error)
@@ -60,7 +92,24 @@ export default function ConversationHistory({
     const success = await deleteConversation(userId, projectId)
     if (success) {
       setConversations((prev) => prev.filter((c) => c.id !== projectId))
+      setProjectArticles((prev) => {
+        const updated = { ...prev }
+        delete updated[projectId]
+        return updated
+      })
     }
+  }
+
+  const toggleProjectExpansion = (projectId: string) => {
+    setExpandedProjects((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(projectId)) {
+        newSet.delete(projectId)
+      } else {
+        newSet.add(projectId)
+      }
+      return newSet
+    })
   }
 
   const formatDate = (dateString: string) => {
@@ -157,55 +206,120 @@ export default function ConversationHistory({
                   {conversations.map((conversation) => {
                     const isActive = conversation.id === currentProjectId
                     const domain = getDomainFromUrl(conversation.url)
-                    const messageCount = conversation.chat_history?.length || 0
+                    const articles = projectArticles[conversation.id] || []
+                    const isExpanded = expandedProjects.has(conversation.id)
 
                     return (
-                      <motion.div
-                        key={conversation.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`group relative mb-2 p-3 rounded-lg cursor-pointer transition-all duration-200 min-h-[64px] ${
-                          isActive
-                            ? 'bg-emerald-500/20 border border-emerald-500/50'
-                            : 'bg-gray-900/50 hover:bg-gray-900 border border-transparent hover:border-gray-700'
-                        }`}
-                        onClick={() => {
-                          onSelectConversation(conversation)
-                          onClose()
-                        }}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-2 mb-1">
-                              <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1"></div>
-                              <p
-                                className={`text-sm font-medium truncate ${
-                                  isActive ? 'text-emerald-300' : 'text-white'
-                                }`}
-                              >
-                                {domain}
-                              </p>
+                      <div key={conversation.id} className="mb-2">
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className={`group relative p-3 rounded-lg transition-all duration-200 ${
+                            isActive
+                              ? 'bg-emerald-500/20 border border-emerald-500/50'
+                              : 'bg-gray-900/50 hover:bg-gray-900 border border-transparent hover:border-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div
+                              className="flex-1 min-w-0 cursor-pointer"
+                              onClick={() => {
+                                onSelectConversation(conversation)
+                                onClose()
+                              }}
+                            >
+                              <div className="flex items-center space-x-2 mb-1">
+                                <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1"></div>
+                                <p
+                                  className={`text-sm font-medium truncate ${
+                                    isActive ? 'text-emerald-300' : 'text-white'
+                                  }`}
+                                >
+                                  {domain}
+                                </p>
+                              </div>
+                              <p className="text-xs text-gray-400 truncate mb-1">{conversation.url}</p>
+                              <div className="flex items-center space-x-3 text-xs text-gray-500">
+                                <span>Chat History</span>
+                                <span>•</span>
+                                <span>{formatDate(conversation.updated_at)}</span>
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-400 truncate mb-1">{conversation.url}</p>
-                            <div className="flex items-center space-x-3 text-xs text-gray-500">
-                              <span>{messageCount} messages</span>
-                              <span>•</span>
-                              <span>{formatDate(conversation.updated_at)}</span>
-                            </div>
+                            <button
+                              onClick={(e) => handleDelete(conversation.id, e)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity p-2 text-gray-400 hover:text-red-400 flex-shrink-0 ml-2"
+                              aria-label="Delete conversation"
+                            >
+                              <FaTrash className="w-4 h-4" />
+                            </button>
                           </div>
-                          <button
-                            onClick={(e) => handleDelete(conversation.id, e)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 text-gray-400 hover:text-red-400 flex-shrink-0 ml-2"
-                            aria-label="Delete conversation"
-                          >
-                            <FaTrash className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </motion.div>
+
+                          {/* Articles Section */}
+                          {articles.length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-gray-800">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  toggleProjectExpansion(conversation.id)
+                                }}
+                                className="flex items-center space-x-2 text-xs text-gray-400 hover:text-emerald-400 transition-colors w-full"
+                              >
+                                {isExpanded ? (
+                                  <FaChevronDown className="w-3 h-3" />
+                                ) : (
+                                  <FaChevronRight className="w-3 h-3" />
+                                )}
+                                <FaFileAlt className="w-3 h-3" />
+                                <span>{articles.length} article{articles.length !== 1 ? 's' : ''}</span>
+                              </button>
+
+                              {/* Articles List */}
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="mt-2 space-y-1">
+                                      {articles.map((article) => (
+                                        <button
+                                          key={article.id}
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            onSelectArticle(article)
+                                            // Don't close sidebar - keep it visible
+                                          }}
+                                          className="w-full text-left px-3 py-2 text-xs text-gray-300 hover:text-emerald-400 hover:bg-gray-800/50 rounded transition-colors truncate"
+                                        >
+                                          • {article.topic}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          )}
+                        </motion.div>
+                      </div>
                     )
                   })}
                 </div>
               )}
+            </div>
+
+            {/* Go to Home Button */}
+            <div className="p-4 border-t border-gray-800 flex-shrink-0">
+              <Link
+                href="/"
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 min-h-[48px] border border-gray-700 hover:border-emerald-500/50"
+              >
+                <FaHome className="w-4 h-4" />
+                <span>Go to Home</span>
+              </Link>
             </div>
           </motion.div>
         </>

@@ -10,9 +10,11 @@ import ConversationHistory from './components/ConversationHistory'
 import { useChat } from '@/hooks/useChat'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
-import { FaSignOutAlt, FaBars, FaHistory } from 'react-icons/fa'
+import { FaSignOutAlt, FaBars, FaHistory, FaHome } from 'react-icons/fa'
 import { identifyUser, trackEvent, resetPostHog } from '@/lib/posthog'
 import { ConversationProject } from '@/utils/database/conversations'
+import { ArticleData } from '@/utils/database/articles'
+import Link from 'next/link'
 
 export default function AppPage() {
   const [autopilot, setAutopilot] = useState(false)
@@ -22,6 +24,7 @@ export default function AppPage() {
   const [userProfile, setUserProfile] = useState<any>(null)
   const [isTrialMode, setIsTrialMode] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [viewingArticle, setViewingArticle] = useState<ArticleData | null>(null)
   const router = useRouter()
   
   // Initialize useChat hook
@@ -147,9 +150,17 @@ export default function AppPage() {
     // Reset PostHog session
     resetPostHog()
     
+    // Clear trial mode from localStorage
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('seobot_trial_mode')
+      window.localStorage.removeItem('seobot_trial_email')
+      window.localStorage.removeItem('seobot_trial_name')
+    }
+    
     await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
+    
+    // Use window.location for a hard redirect to ensure clean state
+    window.location.href = '/'
   }
 
   const getDomainFromUrl = (url: string | null): string => {
@@ -185,11 +196,11 @@ export default function AppPage() {
       </div>
 
       {/* User Profile Header */}
-      {user && (
+      {(user || isTrialMode) && (
         <div className="relative z-20 bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* Sidebar Toggle - Only show for non-trial users */}
-            {!isTrialMode && (
+            {!isTrialMode && user && (
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 lg:hidden"
@@ -198,7 +209,7 @@ export default function AppPage() {
                 <FaBars className="w-5 h-5" />
               </button>
             )}
-            {!isTrialMode && (
+            {!isTrialMode && user && (
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="hidden lg:flex text-gray-400 hover:text-white transition-colors p-2 -ml-2"
@@ -208,13 +219,24 @@ export default function AppPage() {
               </button>
             )}
             <div className="w-8 h-8 bg-primary-green rounded-full flex items-center justify-center text-black font-bold text-sm">
-              {(userProfile?.full_name || user.email || 'U').charAt(0).toUpperCase()}
+              {isTrialMode 
+                ? (typeof window !== 'undefined' ? (window.localStorage.getItem('seobot_trial_name') || 'G').charAt(0).toUpperCase() : 'G')
+                : (userProfile?.full_name || user?.email || 'U').charAt(0).toUpperCase()
+              }
             </div>
             <div>
               <p className="text-white text-sm font-medium">
-                {userProfile?.full_name || user.user_metadata?.full_name || 'User'}
+                {isTrialMode
+                  ? (typeof window !== 'undefined' ? window.localStorage.getItem('seobot_trial_name') || 'Guest User' : 'Guest User')
+                  : (userProfile?.full_name || user?.user_metadata?.full_name || 'User')
+                }
               </p>
-              <p className="text-gray-400 text-xs">{user.email}</p>
+              <p className="text-gray-400 text-xs">
+                {isTrialMode
+                  ? (typeof window !== 'undefined' ? window.localStorage.getItem('seobot_trial_email') || 'Trial Mode' : 'Trial Mode')
+                  : user?.email
+                }
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -222,6 +244,16 @@ export default function AppPage() {
               <div className="bg-yellow-500/10 border border-yellow-500/50 text-yellow-400 px-3 py-1 rounded text-xs mr-2">
                 Trial Mode - Progress won't be saved
               </div>
+            )}
+            {isTrialMode && (
+              <Link
+                href="/"
+                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-800"
+                title="Go to home"
+              >
+                <FaHome className="w-4 h-4" />
+                <span className="text-xs hidden sm:inline">Home</span>
+              </Link>
             )}
             <button
               onClick={handleLogout}
@@ -243,9 +275,14 @@ export default function AppPage() {
             onClose={() => setIsSidebarOpen(false)}
             onSelectConversation={(project: ConversationProject) => {
               loadConversation(project)
+              setViewingArticle(null) // Clear article view when switching conversations
             }}
             onNewConversation={() => {
               resetConversation()
+              setViewingArticle(null) // Clear article view when starting new conversation
+            }}
+            onSelectArticle={(article: ArticleData) => {
+              setViewingArticle(article)
             }}
             currentProjectId={currentProjectId || undefined}
           />
@@ -388,6 +425,57 @@ export default function AppPage() {
             Generating articles... Please wait.
           </div>
         )}
+
+        {/* Article Viewer Overlay - Shows when clicking article from sidebar */}
+        <AnimatePresence>
+          {viewingArticle && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+              style={{ left: isSidebarOpen && !isTrialMode ? '300px' : '0' }}
+              onClick={() => setViewingArticle(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-gray-950 border border-gray-800 rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col relative mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Article Header */}
+                <div className="p-6 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Saved Article</h2>
+                    <p className="text-gray-400 text-sm">From conversation history</p>
+                  </div>
+                  <button
+                    onClick={() => setViewingArticle(null)}
+                    className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+
+                {/* Article Content */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  <GeneratedArticle
+                    article={{
+                      title: viewingArticle.topic,
+                      article: viewingArticle.content,
+                      keywords: viewingArticle.keywords || [],
+                      word_count: viewingArticle.word_count || 0,
+                    }}
+                    index={0}
+                  />
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <style jsx>{`

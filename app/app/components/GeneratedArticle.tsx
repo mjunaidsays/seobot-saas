@@ -123,7 +123,26 @@ export default function GeneratedArticle({ article, index }: GeneratedArticlePro
 
         {/* Article Content Preview */}
         <div className="bg-gray-950 border border-gray-800 rounded p-4 max-h-96 overflow-y-auto">
-          <div className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:text-gray-300 prose-code:text-primary-green prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-800 prose-blockquote:text-gray-400 prose-blockquote:border-gray-700 prose-a:text-primary-green prose-a:no-underline hover:prose-a:underline prose-table:text-gray-300 prose-th:border-gray-700 prose-td:border-gray-700">
+          <div className="prose prose-invert max-w-none 
+            prose-headings:font-bold prose-headings:text-white prose-headings:mb-3 prose-headings:mt-6
+            prose-h1:text-3xl prose-h1:font-extrabold prose-h1:mb-4 prose-h1:mt-0
+            prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-800 prose-h2:pb-2
+            prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-3
+            prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
+            prose-strong:text-white prose-strong:font-bold
+            prose-em:text-gray-200 prose-em:italic
+            prose-ul:text-gray-300 prose-ul:list-disc prose-ul:ml-6 prose-ul:mb-4
+            prose-ol:text-gray-300 prose-ol:list-decimal prose-ol:ml-6 prose-ol:mb-4
+            prose-li:text-gray-300 prose-li:mb-2
+            prose-code:text-primary-green prose-code:bg-gray-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm
+            prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-800 prose-pre:p-4 prose-pre:rounded prose-pre:overflow-x-auto
+            prose-blockquote:text-gray-400 prose-blockquote:border-l-4 prose-blockquote:border-primary-green prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:my-4
+            prose-a:text-primary-green prose-a:font-semibold prose-a:italic prose-a:underline prose-a:decoration-primary-green/30 hover:prose-a:decoration-primary-green prose-a:transition-colors
+            prose-table:text-gray-300 prose-table:border-collapse prose-table:w-full prose-table:my-4
+            prose-th:bg-gray-900 prose-th:border prose-th:border-gray-700 prose-th:px-4 prose-th:py-2 prose-th:font-bold prose-th:text-left
+            prose-td:border prose-td:border-gray-800 prose-td:px-4 prose-td:py-2
+            prose-hr:border-gray-800 prose-hr:my-6
+            prose-img:rounded-lg prose-img:shadow-lg">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {article.article}
             </ReactMarkdown>

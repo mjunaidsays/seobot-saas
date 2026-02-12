@@ -1,12 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ButtonSeobot from './ui/ButtonSeobot'
 import SeobotAuthModal from './AuthForms/SeobotAuthModal'
+import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
+import { trackEvent, resetPostHog } from '@/lib/posthog'
 
 export default function NavbarSeobot() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      // Check if user is authenticated OR in trial mode
+      const trialMode = typeof window !== 'undefined' && window.localStorage.getItem('seobot_trial_mode') === 'true'
+      
+      setIsLoggedIn(!!(user || trialMode))
+    }
+    
+    checkAuth()
+  }, [])
+
+  const handleSignOut = async () => {
+    const supabase = createClient()
+    
+    // Track logout event
+    trackEvent('user_logged_out')
+    
+    // Reset PostHog session
+    resetPostHog()
+    
+    // Clear trial mode from localStorage
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('seobot_trial_mode')
+      window.localStorage.removeItem('seobot_trial_email')
+      window.localStorage.removeItem('seobot_trial_name')
+    }
+    
+    await supabase.auth.signOut()
+    
+    // Hard redirect to landing page
+    window.location.href = '/'
+  }
 
   return (
     <>
@@ -51,13 +92,23 @@ export default function NavbarSeobot() {
 
             {/* CTA Button */}
             <div className="flex items-center">
-              <ButtonSeobot
-                variant="primary"
-                size="md"
-                onClick={() => setIsAuthModalOpen(true)}
-              >
-                Try now
-              </ButtonSeobot>
+              {isLoggedIn ? (
+                <ButtonSeobot
+                  variant="primary"
+                  size="md"
+                  onClick={handleSignOut}
+                >
+                  Sign out
+                </ButtonSeobot>
+              ) : (
+                <ButtonSeobot
+                  variant="primary"
+                  size="md"
+                  onClick={() => setIsAuthModalOpen(true)}
+                >
+                  Try now
+                </ButtonSeobot>
+              )}
             </div>
           </div>
         </div>

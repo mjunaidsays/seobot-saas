@@ -7,6 +7,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FaLinkedin, FaTwitter, FaEnvelope } from 'react-icons/fa'
 import SeobotAuthModal from './AuthForms/SeobotAuthModal'
+import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
 
 // Lazy-load animation features for better performance
 const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
@@ -24,6 +26,8 @@ export default function HeroSeobot() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isTyping, setIsTyping] = useState(true)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [userState, setUserState] = useState<'guest' | 'authenticated' | 'none'>('none')
+  const router = useRouter()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,6 +40,49 @@ export default function HeroSeobot() {
 
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    const checkAuthState = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      // Check if in trial mode (guest user)
+      const trialMode = typeof window !== 'undefined' && window.localStorage.getItem('seobot_trial_mode') === 'true'
+      
+      if (user) {
+        setUserState('authenticated')
+      } else if (trialMode) {
+        setUserState('guest')
+      } else {
+        setUserState('none')
+      }
+    }
+    
+    checkAuthState()
+  }, [])
+
+  const handleCTAClick = () => {
+    if (userState === 'guest') {
+      // Guest user - go directly to app
+      router.push('/app?trial=1')
+    } else if (userState === 'authenticated') {
+      // Authenticated user - go to dashboard/app
+      router.push('/app')
+    } else {
+      // Not logged in - show auth modal
+      setIsAuthModalOpen(true)
+    }
+  }
+
+  const getButtonText = () => {
+    if (userState === 'guest') {
+      return 'Start automating SEO'
+    } else if (userState === 'authenticated') {
+      return 'Go to SEO dashboard'
+    } else {
+      return 'Start automating SEO'
+    }
+  }
 
   return (
     <LazyMotion features={loadFeatures} strict>
@@ -115,10 +162,10 @@ export default function HeroSeobot() {
           <ButtonSeobot
             variant="primary"
             size="lg"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={handleCTAClick}
             className="text-lg px-10 py-5"
           >
-            Start automating SEO
+            {getButtonText()}
           </ButtonSeobot>
         </m.div>
 
